@@ -45,13 +45,17 @@ markers = [
     create_marker(30, 30, 30, radius=0.5, color=(0.0, 0.0, 1.0))   # Blue marker
 ]
 
-# Add all markers to the renderer
+marker_renderer = vtk.vtkRenderer()
 for marker in markers:
-    renderer.AddActor(marker)
+    marker_renderer.AddActor(marker)
+marker_renderer.SetBackground(0, 0, 0)
+marker_renderer.SetLayer(1)
 
 # Create a render window and add the renderer
 render_window = vtk.vtkRenderWindow()
+render_window.SetNumberOfLayers(2)
 render_window.AddRenderer(renderer)
+render_window.AddRenderer(marker_renderer)
 render_window.SetSize(800, 600)
 
 # Create a render window interactor to handle user input
