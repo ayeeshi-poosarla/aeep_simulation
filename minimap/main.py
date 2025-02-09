@@ -36,6 +36,7 @@ actor.GetProperty().SetOpacity(0.7)  # Make the model slightly transparent
 renderer = vtk.vtkRenderer()
 renderer.AddActor(actor)
 renderer.SetBackground(0.1, 0.2, 0.4)
+renderer.SetLayer(0)
 
 # Example: Add multiple markers at different coordinates
 # You can add more markers by calling create_marker with different coordinates
