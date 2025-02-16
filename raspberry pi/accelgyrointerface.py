@@ -54,12 +54,8 @@ while True:
 	Gz = gyro_z/131.0
 	
 	f = open("accelgyro.txt", "a")
-	result = (f"Gx={Gx:.2f}{u'\u00b0'}/s\t"
-          f"Gy={Gy:.2f}{u'\u00b0'}/s\t"
-          f"Gz={Gz:.2f}{u'\u00b0'}/s\t"
-          f"Ax={Ax:.2f} g\t"
-          f"Ay={Ay:.2f} g\t"
-          f"Az={Az:.2f} g")
+	result = ("Gx=%.2f%s/s\tGy=%.2f%s/s\tGz=%.2f%s/s\tAx=%.2f g\tAy=%.2f g\tAz=%.2f g" %
+          (Gx, u'\u00b0', Gy, u'\u00b0', Gz, u'\u00b0', Ax, Ay, Az))
 	f.write(result)
 	f.close()
 	sleep(1)
