@@ -35,8 +35,8 @@ Device_Address = 0x68
 MPU_Init()
 
 print("Reading Data of Gyroscope and Accelerometer")
-
-while True:
+i = 0
+while i < 10:
 	acc_x = read_raw_data(ACCEL_XOUT_H)
 	acc_y = read_raw_data(ACCEL_YOUT_H)
 	acc_z = read_raw_data(ACCEL_ZOUT_H)
@@ -54,8 +54,10 @@ while True:
 	Gz = gyro_z/131.0
 	
 	f = open("accelgyro.txt", "a")
-	result = ("Gx=%.2f%s/s\tGy=%.2f%s/s\tGz=%.2f%s/s\tAx=%.2f g\tAy=%.2f g\tAz=%.2f g" %
+	result = ("Gx=%.2f%s/s\tGy=%.2f%s/s\tGz=%.2f%s/s\tAx=%.2f g\tAy=%.2f g\tAz=%.2f g\n" %
           (Gx, u'\u00b0', Gy, u'\u00b0', Gz, u'\u00b0', Ax, Ay, Az))
 	f.write(result)
+	print(result)
 	f.close()
+	i += 1
 	sleep(1)
