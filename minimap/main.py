@@ -21,7 +21,8 @@ def create_marker(x, y, z, radius=1.0, color=(1.0, 0.0, 0.0)):
 # Create the STL Actor (Layer 0)
 # ---------------------------
 stl_reader = vtk.vtkSTLReader()
-stl_reader.SetFileName("/Users/Ayeeshi/Documents/DT03/bph_mold_meshsolid.stl")
+filepath = "/Users/Ayeeshi/Documents/DT03/" # Update this to your path
+stl_reader.SetFileName(filepath + "bph_mold_meshsolid.stl")
 stl_reader.Update()
 
 mapper = vtk.vtkPolyDataMapper()
