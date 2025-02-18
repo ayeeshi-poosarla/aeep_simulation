@@ -31,12 +31,3 @@ def compute_positions_from_file(filename, dt=0.01):
         position_z[i] = position_z[i-1] + velocity_z[i] * dt
 
     return position_x, position_y, position_z
-
-# Call the function
-filename = "accelgyro.txt"
-positions_x, positions_y, positions_z = compute_positions_from_file(filename)
-
-print("Estimated Positions (X, Y, Z):")
-print("X:", positions_x)
-print("Y:", positions_y)
-print("Z:", positions_z)

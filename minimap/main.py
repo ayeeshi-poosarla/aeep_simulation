@@ -1,4 +1,7 @@
 import vtk
+import numpy as np
+import re
+import coordinates
 
 def create_marker(x, y, z, radius=1.0, color=(1.0, 0.0, 0.0)):
     """Create a sphere marker at the specified coordinates"""
@@ -64,51 +67,45 @@ render_window_interactor.SetRenderWindow(render_window)
 interactor_style = vtk.vtkInteractorStyleTrackballCamera()
 render_window_interactor.SetInteractorStyle(interactor_style)
 
-# ---------------------------
-# Timer Callback for Updating Coordinates (for Marker)
-# ---------------------------
-class TimerCallback:
-    def __init__(self, filename, actor):
-        self.file = open(filename, "r")
-        self.actor = actor
-        self.timer_id = None
+# # ---------------------------
+# # Timer Callback for Updating Coordinates (for Marker)
+# # ---------------------------
+# class TimerCallback:
+#     def __init__(self, filename, actor):
+#         self.file = open(filename, "r")
+#         self.actor = actor
+#         self.timer_id = None
 
-    def execute(self, obj, event):
-        line = self.file.readline()
-        if not line:
-            print("End of coordinate file reached. Stopping timer.")
-            self.file.close()
-            # Stop the timer when end-of-file is reached.
-            obj.DestroyTimer(self.timer_id)
-            return
+#     def execute(self, obj, event):
+#         line = self.file.readline()
+#         if not line:
+#             print("End of coordinate file reached. Stopping timer.")
+#             self.file.close()
+#             # Stop the timer when end-of-file is reached.
+#             obj.DestroyTimer(self.timer_id)
+#             return
+#         try:
+#             x, y, z = coordinates.compute_positions_from_file(self.file)
+#         except ValueError:
+#             print("Could not convert line to floats:", line)
+#             return
 
-        line = line.strip()
-        if not line:
-            return  # Skip empty lines
+#         # Update the marker's position
+#         self.actor.SetPosition(x, y, z)
+#         print(f"Moving marker to: ({x}, {y}, {z})")
+#         obj.GetRenderWindow().Render()
 
-        try:
-            parts = line.split()
-            if len(parts) != 3:
-                print("Invalid coordinate line:", line)
-                return
-            x, y, z = map(float, parts)
-        except ValueError:
-            print("Could not convert line to floats:", line)
-            return
-
-        # Update the marker's position
-        self.actor.SetPosition(x, y, z)
-        print(f"Moving marker to: ({x}, {y}, {z})")
-        obj.GetRenderWindow().Render()
+filename = 'accelgyro.txt'
+x, y, z = coordinates.compute_positions_from_file(filename)
+marker.SetPosition(x, y, z)
 
 # Create an instance of the callback with the coordinates file and the marker actor to update.
-callback = TimerCallback("/Users/Ayeeshi/Documents/DT03/aeep_simulation/minimap/coordinates.txt", marker)
+# callback = TimerCallback("/Users/Ayeeshi/Documents/DT03/aeep_simulation/minimap/accelgyro.txt", marker)
 
 # Add the timer callback observer.
-render_window_interactor.AddObserver('TimerEvent', callback.execute)
-# Create a repeating timer event (every 1000 milliseconds in this example)
-timer_id = render_window_interactor.CreateRepeatingTimer(1000)
-callback.timer_id = timer_id
+# render_window_interactor.AddObserver('TimerEvent', callback.execute)
+# timer_id = render_window_interactor.CreateRepeatingTimer(1000)
+# callback.timer_id = timer_id
 
 # ---------------------------
 # Start the Render Window Interactor
