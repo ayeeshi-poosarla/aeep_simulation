@@ -44,40 +44,32 @@ mapper.SetInputConnection(stl_reader.GetOutputPort())
 actor = vtk.vtkActor()
 actor.SetMapper(mapper)
 actor.GetProperty().SetColor(1.0, 0.8, 0.3)
-actor.GetProperty().SetOpacity(1)
+actor.GetProperty().SetOpacity(0.7)
 
-# Create a renderer and add the actor to it
+# Create a single renderer
 renderer = vtk.vtkRenderer()
-renderer.AddActor(actor)
 renderer.SetBackground(0.1, 0.2, 0.4)
-renderer.SetLayer(0)
 
-# Create markers at appropriate positions with scaled size
-markers = [
-    create_marker(center_x, center_y, center_z, radius=marker_radius, color=(1.0, 0.0, 0.0)),  # Red marker at center
-]
+# Add the STL actor first
+renderer.AddActor(actor)
 
-marker_renderer = vtk.vtkRenderer()
-for marker in markers:
-    marker_renderer.AddActor(marker)
-marker_renderer.SetBackground(0, 0, 0)
-marker_renderer.SetLayer(1)
+# Create and add marker
+marker = create_marker(center_x, center_y, center_z, radius=marker_radius, color=(1.0, 0.0, 0.0))
+renderer.AddActor(marker)
 
-# Create a render window and add the renderers
+# Create render window
 render_window = vtk.vtkRenderWindow()
-render_window.SetNumberOfLayers(2)
 render_window.AddRenderer(renderer)
-render_window.AddRenderer(marker_renderer)
 render_window.SetSize(800, 600)
 
-# Share the camera between renderers
-marker_renderer.SetActiveCamera(renderer.GetActiveCamera())
+# Enable transparency options
+render_window.SetAlphaBitPlanes(1)
+render_window.SetMultiSamples(0)
+renderer.SetUseDepthPeeling(1)
+renderer.SetMaximumNumberOfPeels(100)
+renderer.SetOcclusionRatio(0.0)
 
-# Set viewports
-renderer.SetViewport(0, 0, 1, 1)
-marker_renderer.SetViewport(0, 0, 1, 1)
-
-# Create a render window interactor
+# Create interactor
 render_window_interactor = vtk.vtkRenderWindowInteractor()
 render_window_interactor.SetRenderWindow(render_window)
 
@@ -85,7 +77,7 @@ render_window_interactor.SetRenderWindow(render_window)
 interactor_style = vtk.vtkInteractorStyleTrackballCamera()
 render_window_interactor.SetInteractorStyle(interactor_style)
 
-# Reset camera to fit all actors
+# Reset camera
 renderer.ResetCamera()
 
 # Initialize and start
