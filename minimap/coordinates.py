@@ -1,33 +1,33 @@
 import re
 import numpy as np
 
-def compute_positions_from_file(filename, dt=0.01):
-    """Reads acceleration data from file, integrates it to estimate position."""
-    accel_x, accel_y, accel_z = [], [], []
-    pattern = re.compile(r"Ax=(-?\d+\.\d+).+?Ay=(-?\d+\.\d+).+?Az=(-?\d+\.\d+)")
+class IMUPositionEstimator:
+    def __init__(self, dt=0.01):
+        """Initialize with default time step and store previous values."""
+        self.dt = dt
+        self.prev_velocity = np.array([0.0, 0.0, 0.0])
+        self.prev_position = np.array([0.0, 0.0, 0.0])
+        self.prev_accel = np.array([0.0, 0.0, 0.0])
+        self.pattern = re.compile(r"Ax=(-?\d+\.\d+).+?Ay=(-?\d+\.\d+).+?Az=(-?\d+\.\d+)")
 
-    # Read and extract acceleration data
-    with open(filename, 'r') as file:
-        for line in file:
-            match = pattern.search(line)
-            if match:
-                ax, ay, az = map(float, match.groups())
-                accel_x.append(ax)
-                accel_y.append(ay)
-                accel_z.append(az)
+    def update_position(self, line):
+        """Process a single line of IMU data and return updated position."""
+        match = self.pattern.search(line)
+        if not match:
+            return self.prev_position  # Return last known position if no match
 
-    # Integrate acceleration to estimate velocity and position
-    n = len(accel_x)
-    velocity_x, velocity_y, velocity_z = np.zeros(n), np.zeros(n), np.zeros(n)
-    position_x, position_y, position_z = np.zeros(n), np.zeros(n), np.zeros(n)
+        # Parse acceleration values
+        accel = np.array(list(map(float, match.groups())))
 
-    for i in range(1, n):
-        velocity_x[i] = velocity_x[i-1] + accel_x[i] * dt
-        velocity_y[i] = velocity_y[i-1] + accel_y[i] * dt
-        velocity_z[i] = velocity_z[i-1] + accel_z[i] * dt
+        # Integrate acceleration to estimate velocity
+        velocity = self.prev_velocity + (self.prev_accel + accel) / 2 * self.dt  # Trapezoidal integration
 
-        position_x[i] = position_x[i-1] + velocity_x[i] * dt
-        position_y[i] = position_y[i-1] + velocity_y[i] * dt
-        position_z[i] = position_z[i-1] + velocity_z[i] * dt
+        # Integrate velocity to estimate position
+        position = self.prev_position + (self.prev_velocity + velocity) / 2 * self.dt  # Trapezoidal integration
 
-    return position_x, position_y, position_z
+        # Update previous values
+        self.prev_accel = accel
+        self.prev_velocity = velocity
+        self.prev_position = position
+
+        return position
