@@ -8,17 +8,19 @@ def main():
     # Load the STL file
     mesh = pv.read(stl_file)
 
+    #idk if this is necessary but don't touch it 
     new_origin = np.array([1.0, 1.0, 1.0])
     current_center = np.array(mesh.center)
     translation_vector = new_origin - current_center
     mesh.translate(translation_vector)
 
 
-    # Translate the mesh so that its geometric center is at the origin
-    #mesh.translate(-np.array(mesh.center))
 
+
+    #set marker to specified location
     desired_marker_position = [0.08, -0.12, -0.08]
     marker = pv.PolyData(np.array([desired_marker_position]))
+    #the block below moves the marker position to the center 
     #marker_position = mesh.center
     #marker = pv.PolyData(np.array([marker_position]))
 
