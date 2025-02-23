@@ -3,7 +3,7 @@ import numpy as np
 
 def main():
     # Replace 'my_model.stl' with the path to your STL file
-    stl_file = "minimap/bph_mold_meshsolid.stl"
+    stl_file = "bph_mold_combined.stl"
 
     # Load the STL file
     mesh = pv.read(stl_file)

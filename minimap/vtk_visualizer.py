@@ -19,8 +19,7 @@ def create_marker(x, y, z, radius=1.0, color=(1.0, 0.0, 0.0)):
 
 # Create an STL reader and specify the file name
 stl_reader = vtk.vtkSTLReader()
-filepath = "/Users/Ayeeshi/Documents/DT03/" # Update this to your path
-stl_reader.SetFileName(filepath + "bph_mold_meshsolid.stl")
+stl_reader.SetFileName("minimap/bph_mold_combined.stl")
 stl_reader.Update()
 
 # Get STL bounds
