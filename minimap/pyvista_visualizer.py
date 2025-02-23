@@ -3,6 +3,8 @@ import numpy as np
 
 def main():
     # Replace 'my_model.stl' with the path to your STL file
+    print("Hi")
+    print("this is a test")
     stl_file = "minimap/bph_mold_meshsolid.stl"
 
     # Load the STL file
