@@ -1,0 +1,35 @@
+import serial
+import time
+
+ser = serial.Serial('/dev/ttyACM0', 9600)
+arduino = serial.Serial('/dev/ttyACM1', 115200, timeout=1)
+time.sleep(2)
+f = open("datafile.txt", "a")
+
+while True:
+	read_serial = ser.readline()
+	try:
+		read_serial = read_serial.decode("utf-8")
+	except:
+		read_serial = read_serial.decode("utf-8")
+	line = arduino.readline().decode('utf-8').rstrip()
+	if line:
+		print(line)
+		f.write(line)
+	
+	
+		
+	print("Force: ", read_serial) # units is in grams
+	f.write("Force: "+  read_serial)
+	f.write("meowmewoemwoemwo")
+	
+		
+f.close()
+	
+	
+
+
+
+
+
+	
