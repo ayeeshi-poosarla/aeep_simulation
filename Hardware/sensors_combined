@@ -8,7 +8,7 @@ def save_data(filename, data):
             f.write(line + "\n")
 
 # Set up serial connections
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 arduino = serial.Serial('/dev/ttyACM1', 115200, timeout=1)
 time.sleep(2)
 
@@ -16,27 +16,22 @@ collected_data = []  # List to store data
 filename = "datafile.txt"
 
 while True:
-    read_serial = ser.readline()
-    try:
-        read_serial = read_serial.decode("utf-8").strip()
-    except:
-        read_serial = ""
-
-    line = arduino.readline().decode('utf-8').strip()
+    read_serial = ser.readline().decode('utf-8', errors='ignore').strip()
+    line = arduino.readline().decode('utf-8', errors='ignore').strip()
     
     if line:
         print(line)
         collected_data.append(line)
 
-        # Check for "STOP" signal
-        if "STOP" in line:
+        # Check for "STOP" signal (ensuring no hidden whitespace issues)
+        if "STOP" in line.strip():
             print("Stopping data collection.")
-            save_data(filename, collected_data)
-            print(f"Data saved successfully to {filename}.")
-            break
+            break  # Exit the while loop
 
-    print("Force: ", read_serial)  # Units in grams
-    collected_data.append("Force: " + read_serial)
+    if read_serial:
+        print("Force: ", read_serial)  # Units in grams
+        collected_data.append("Force: " + read_serial)
 
 # Save collected data before exiting
 save_data(filename, collected_data)
+print(f"Data saved successfully to {filename}.")
