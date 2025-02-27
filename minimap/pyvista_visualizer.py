@@ -4,7 +4,7 @@ import numpy as np
 def main():
     # Replace 'my_model.stl' with the path to your STL file
     # stl_file = "minimap/bph_mold_meshsolid.stl"
-    stl_file = "C:/Users/reach/OneDrive/Documents/2024-25/DT/bph_mold_meshsolid.stl"
+    stl_file = "/Users/bennettye/Documents/DT03/bph_mold_combined.stl"
 
     # Load the STL file
     mesh = pv.read(stl_file)
@@ -59,8 +59,8 @@ def main():
     plotter = pv.Plotter()
 
     # Add the mesh to the plotter
-    plotter.add_mesh(mesh, color="white", show_edges=True)
-    plotter.add_mesh(marker, color="red", render_points_as_spheres=True, point_size=20)
+    plotter.add_mesh(mesh, color="white", show_edges=True, opacity = 0.25)
+    plotter.add_mesh(marker, color="cyan", render_points_as_spheres=True, point_size=20)
     plotter.window_size = [1200, 900]  # Scale the render window size
 
     # Add the border edges to the plotter with a specific color and width
