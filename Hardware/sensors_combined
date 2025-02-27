@@ -1,0 +1,42 @@
+import serial
+import time
+
+def save_data(filename, data):
+    """Save collected data to a file."""
+    with open(filename, "a") as f:
+        for line in data:
+            f.write(line + "\n")
+
+# Set up serial connections
+ser = serial.Serial('/dev/ttyACM0', 9600)
+arduino = serial.Serial('/dev/ttyACM1', 115200, timeout=1)
+time.sleep(2)
+
+collected_data = []  # List to store data
+filename = "datafile.txt"
+
+while True:
+    read_serial = ser.readline()
+    try:
+        read_serial = read_serial.decode("utf-8").strip()
+    except:
+        read_serial = ""
+
+    line = arduino.readline().decode('utf-8').strip()
+    
+    if line:
+        print(line)
+        collected_data.append(line)
+
+        # Check for "STOP" signal
+        if "STOP" in line:
+            print("Stopping data collection.")
+            save_data(filename, collected_data)
+            print(f"Data saved successfully to {filename}.")
+            break
+
+    print(read_serial)  # Units in grams
+    collected_data.append(read_serial)
+
+# Save collected data before exiting
+save_data(filename, collected_data)
