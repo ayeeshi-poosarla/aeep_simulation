@@ -9,22 +9,36 @@ time.sleep(2)
 filename = "datafile.txt"
 f = open("datafile.txt", "a")
 
-//having waiting loop until force is over threshold
+#having waiting loop until force is over threshold
 while True:
-    force = ser.readline().decode('utf-8').strip()
-    if force > 0.05:
+    force = ser.readline().decode('utf-8', errors="ignore").strip()
+    
+    if not force:
+        continue
+    
+    x = float(force)
+    #print(force)
+    
+    if x > 0.05:
         start_time = time.time()
         break
 
 count = 0
 while True:
     #read in data from the serial
-    force = ser.readline().decode('utf-8').strip()
-    imu = arduino.readline().decode('utf-8').strip()
+    
+    acceleration = arduino.readline().decode('utf-8', errors="ignore").rstrip()
+    rotation = arduino.readline().decode('utf-8', errors="ignore").rstrip()
+    force = ser.readline().decode('utf-8', errors="ignore").strip()
+    
+    if not force:
+        continue
+    
+    x = float(force)
 
-    if force < 0.05:
+    if x < 0.15:
         count += 1
-    else if: 
+    else: 
         count = 0
     #If force threshold has not been met for 10 loops exit the loop
     if count > 10:
@@ -32,10 +46,16 @@ while True:
 
     cur_time = time.time()  # Get current time at the end
     elapsed_time = cur_time - start_time
+    
+    print(f"{elapsed_time:.2f}")
+    print(rotation)
+    print(acceleration)
     print("Force: ", force)
-    print(imu)
-
-    f.write("Force: ", force)
-    f.write(imu)
+    print("\n")
+    
+    f.write("\n"+rotation)
+    f.write("\n"+acceleration)
+    f.write("\nForce: "+ force)
+    
 
 f.close()
