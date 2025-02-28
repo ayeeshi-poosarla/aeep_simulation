@@ -47,6 +47,12 @@ def main():
 
     # Create a PolyData object for the border lines
     border_lines = pv.PolyData()
+    coordinate_file = "minimap/coordinates.txt"
+    f = open(coordinate_file)
+    coordinates = [line.strip().split(' ') for line in f if len(line.strip().split(' ')) >= 3]
+    print(coordinates)
+    f.close()
+
 
     # Loop through edges to create the lines
     for edge in edges:
@@ -60,6 +66,8 @@ def main():
 
     # Add the mesh to the plotter
     plotter.add_mesh(mesh, color="white", show_edges=True, opacity = 0.25)
+    marker_position = mesh.center
+    marker = pv.PolyData(np.array([marker_position]))
     plotter.add_mesh(marker, color="cyan", render_points_as_spheres=True, point_size=20)
     plotter.window_size = [1200, 900]  # Scale the render window size
 
@@ -70,6 +78,22 @@ def main():
     plotter.show_axes()
 
     # Display the interactive window
+    frame = 0
+
+    def update_position(caller, timer_id):
+        nonlocal frame
+        if frame < len(coordinates):
+            coords = coordinates[frame]
+            x, y, z = float(coords[0]), float(coords[1]), float(coords[2])
+            marker.points = np.array([[x, y, z]])
+            plotter.render()
+            frame += 1
+
+    # Set up the timer
+    plotter.iren.add_observer('TimerEvent', update_position)
+    timer_id = plotter.iren.create_timer(1000)  # 100 milliseconds
+    
+    # Show the plotter window
     plotter.show()
 
 if __name__ == "__main__":
