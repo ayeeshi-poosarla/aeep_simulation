@@ -1,8 +1,14 @@
+0.000003
+Rotation X: -8.24, Y: -6.93, Z: 0.77 rad/s
+Acceleration X: 1.55, Y: 4.50, Z: -16.84 m/s^2
+
 0.000006
 Rotation X: -1.04, Y: 1.06, Z: 0.68 rad/s
 Acceleration X: 1.08, Y: 6.59, Z: -8.28 m/s^2
 
 0.000181
+Rotation X: 0.47, Y: -0.08, Z: 0.26 rad/s
+Acceleration X: 6.48, Y: 6.25, Z: -5.54 m/s^2
 
 0.001019
 Rotation X: 1.41, Y: 0.71, Z: -2.62 rad/s
