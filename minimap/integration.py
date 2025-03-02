@@ -65,6 +65,8 @@ initial_velocity = [accelerations[0][0] * initial_time, accelerations[0][1] * in
 initial_position = [0.5 * accelerations[0][0] * (initial_time**2), 
     0.5 * accelerations[0][1] * (initial_time**2), 0.5 * accelerations[0][0] * (initial_time**2)]
 
+coordinates_file = "minimap/coordinates.txt"
+f = open(coordinates_file, "w")
 for i in range(1, len(times)):
     time = times[i]
     acceleration = accelerations[i]
@@ -75,6 +77,8 @@ for i in range(1, len(times)):
     position = [initial_position[0] + (initial_velocity[0] * time) + (0.5 * acceleration[0] * (time ** 2)),
         initial_position[1] + (initial_velocity[1] * time) + (0.5 * acceleration[1] * (time ** 2)), 
         initial_position[2] + (initial_velocity[2] * time) + (0.5 * acceleration[2] * (time ** 2))]
+    f.write(' '.join(map(str, position)))
+    f.write("\n")
     
     print(position)
     initial_velocity = velocity

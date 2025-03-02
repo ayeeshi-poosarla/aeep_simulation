@@ -67,6 +67,7 @@ def main():
 
     # Create a PyVista plotter
     plotter = pv.Plotter()
+    plotter.set_scale(xscale = 0.00001, yscale = 0.00001, zscale = 0.00001)
 
     # Add the mesh to the plotter
     plotter.add_mesh(mesh, color="white", show_edges=True, opacity = 0.25)
