@@ -1,0 +1,52 @@
+
+0.00
+Rotation X: 4.00, Y: 2.46, Z: 4.32 rad/s
+Acceleration X: -0.98, Y: 4.79, Z: -12.68 m/s^2
+
+0.01
+Rotation X: -2.38, Y: 2.70, Z: -1.95 rad/s
+Acceleration X: 6.82, Y: 9.08, Z: -4.96 m/s^2
+
+0.24
+Rotation X: -1.06, Y: 1.71, Z: 0.74 rad/s
+Acceleration X: 0.31, Y: 0.95, Z: -11.56 m/s^2
+
+1.26
+Rotation X: 0.18, Y: 8.73, Z: -2.41 rad/s
+Acceleration X: 4.85, Y: -5.71, Z: -7.47 m/s^2
+
+2.27
+Rotation X: 2.58, Y: -8.73, Z: -1.52 rad/s
+Acceleration X: 9.91, Y: -5.12, Z: -13.68 m/s^2
+
+3.29
+Rotation X: 2.94, Y: 4.98, Z: -0.98 rad/s
+Acceleration X: -3.91, Y: 10.13, Z: -11.40 m/s^2
+
+4.30
+Rotation X: -4.62, Y: 1.48, Z: 0.13 rad/s
+Acceleration X: 13.52, Y: 12.74, Z: -11.35 m/s^2
+
+5.32
+Rotation X: -7.01, Y: -1.23, Z: 2.88 rad/s
+Acceleration X: -7.24, Y: 12.37, Z: -8.44 m/s^2
+
+6.33
+Rotation X: 2.64, Y: 4.51, Z: -3.56 rad/s
+Acceleration X: 0.86, Y: 5.70, Z: -4.00 m/s^2
+
+7.35
+Rotation X: 2.36, Y: -5.33, Z: 1.38 rad/s
+Acceleration X: 14.70, Y: 17.62, Z: -14.64 m/s^2
+
+8.36
+Rotation X: 0.08, Y: 3.66, Z: 0.60 rad/s
+Acceleration X: -4.58, Y: 12.42, Z: -12.69 m/s^2
+
+9.38
+Rotation X: 8.73, Y: -8.73, Z: -1.03 rad/s
+Acceleration X: 13.78, Y: 3.70, Z: -24.98 m/s^2
+
+10.39
+Rotation X: 2.83, Y: 4.11, Z: -3.28 rad/s
+Acceleration X: 0.79, Y: 8.66, Z: -4.30 m/s^2
