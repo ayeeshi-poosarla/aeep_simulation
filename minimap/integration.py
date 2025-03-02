@@ -56,7 +56,7 @@ while i < len(lines):
 print("Time values:", times)
 print("Acceleration vectors:", accelerations)
 
-initial_time = times[0] / 1000
+initial_time = times[0] 
 initial_acceleration = accelerations[0]
 
 initial_velocity = [accelerations[0][0] * initial_time, accelerations[0][1] * initial_time, 
@@ -66,7 +66,7 @@ initial_position = [0.5 * accelerations[0][0] * (initial_time**2),
     0.5 * accelerations[0][1] * (initial_time**2), 0.5 * accelerations[0][0] * (initial_time**2)]
 
 for i in range(1, len(times)):
-    time = (times[i] - initial_time)/1000
+    time = times[i] - initial_time
     acceleration = accelerations[i]
 
     velocity = [initial_velocity[0] + (acceleration[0] * time), 
