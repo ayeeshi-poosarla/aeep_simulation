@@ -93,6 +93,7 @@ def main():
             plotter.render()
             frame += 1
 
+
     # Set up the timer
     plotter.iren.add_observer('TimerEvent', update_position)
     timer_id = plotter.iren.create_timer(1000)  # 100 milliseconds

@@ -66,7 +66,7 @@ initial_position = [0.5 * accelerations[0][0] * (initial_time**2),
     0.5 * accelerations[0][1] * (initial_time**2), 0.5 * accelerations[0][0] * (initial_time**2)]
 
 for i in range(1, len(times)):
-    time = times[i] - initial_time
+    time = times[i]
     acceleration = accelerations[i]
 
     velocity = [initial_velocity[0] + (acceleration[0] * time), 
