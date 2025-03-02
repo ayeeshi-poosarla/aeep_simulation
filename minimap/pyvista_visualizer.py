@@ -49,7 +49,11 @@ def main():
     border_lines = pv.PolyData()
     coordinate_file = "minimap/coordinates.txt"
     f = open(coordinate_file)
-    coordinates = [line.strip().split(' ') for line in f if len(line.strip().split(' ')) >= 3]
+    coordinates = [
+        line.strip().replace('[','').replace(']','').replace(',','').split()
+        for line in f
+        if len(line.strip().replace('[','').replace(']','').replace(',','').split()) >= 3
+    ]
     print(coordinates)
     f.close()
 

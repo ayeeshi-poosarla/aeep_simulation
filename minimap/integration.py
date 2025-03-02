@@ -1,22 +1,82 @@
 import re
 import numpy as np
 
-data_file = "minimap/accelgyro.txt"
-with open(data_file, "r") as file:
+pattern = r"Acceleration\s+X:\s*([-\d.]+)\s*,\s*Y:\s*([-\d.]+)\s*,\s*Z:\s*([-\d.]+)"
+
+# Lists to store time values and acceleration vectors.
+times = []
+accelerations = []
+
+with open("data/imu_data.txt", "r") as file:
     lines = file.readlines()
 
-accelerations = []
-for line in lines:
-    match_ax = re.search(r"Ax=([-\d.]+)", line)
-    match_ay = re.search(r"Ay=([-\d.]+)", line)
-    match_az = re.search(r"Az=([-\d.]+)", line)
+i = 0
+while i < len(lines):
+    # Get the time stamp (first non-empty line in the block)
+    line = lines[i].strip()
+    if not line:
+        i += 1
+        continue
+
+    try:
+        t = float(line)
+        times.append(t)
+    except ValueError:
+        i += 1
+        continue
+
+    # Skip the next non-empty line (rotation data)
+    i += 1
+    while i < len(lines) and lines[i].strip() == "":
+        i += 1
+
+    # Now, skip the rotation data line
+    if i < len(lines):
+        i += 1  # skip rotation data line
+
+    # Skip any empty lines before the acceleration data line
+    while i < len(lines) and lines[i].strip() == "":
+        i += 1
+
+    # Next non-empty line should be the acceleration data line.
+    if i < len(lines):
+        acc_line = lines[i].strip()
+        match = re.search(pattern, acc_line)
+        if match:
+            ax = float(match.group(1))
+            ay = float(match.group(2))
+            az = float(match.group(3))
+            accelerations.append([ax, ay, az])
+        else:
+            print("Regex did not match acceleration line:", acc_line)
     
-    if match_ax and match_ay and match_az:
-        ax = float(match_ax.group(1))
-        ay = float(match_ay.group(1))
-        az = float(match_az.group(1))
+    i += 1
 
-    accelerations.append([ax, ay, az])
+# Display the stored arrays.
+print("Time values:", times)
+print("Acceleration vectors:", accelerations)
 
-for vector in accelerations:
-    print(vector)
+initial_time = times[0] / 1000
+initial_acceleration = accelerations[0]
+
+initial_velocity = [accelerations[0][0] * initial_time, accelerations[0][1] * initial_time, 
+    accelerations[0][2] * initial_time]
+
+initial_position = [0.5 * accelerations[0][0] * (initial_time**2), 
+    0.5 * accelerations[0][1] * (initial_time**2), 0.5 * accelerations[0][0] * (initial_time**2)]
+
+for i in range(1, len(times)):
+    time = (times[i] - initial_time)/1000
+    acceleration = accelerations[i]
+
+    velocity = [initial_velocity[0] + (acceleration[0] * time), 
+        initial_velocity[1] + (acceleration[1] * time), initial_velocity[2] + (acceleration[2] * time)]
+
+    position = [initial_position[0] + (initial_velocity[0] * time) + (0.5 * acceleration[0] * (time ** 2)),
+        initial_position[1] + (initial_velocity[1] * time) + (0.5 * acceleration[1] * (time ** 2)), 
+        initial_position[2] + (initial_velocity[2] * time) + (0.5 * acceleration[2] * (time ** 2))]
+    
+    print(position)
+    initial_velocity = velocity
+    initial_position = position
+    initial_time = times[i]
