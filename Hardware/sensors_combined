@@ -2,8 +2,8 @@ import serial
 import time
 
 # Set up serial connections
-ser = serial.Serial('/dev/ttyACM0', 9600) #force
-arduino = serial.Serial('/dev/ttyACM1', 115200, timeout=1) #imu
+ser = serial.Serial('/dev/ttyACM0',9600) #force
+arduino = serial.Serial('/dev/ttyACM1',115200, timeout=1) #imu
 time.sleep(2)
 
 filename = "datafile.txt"
@@ -32,6 +32,9 @@ while True:
     force = ser.readline().decode('utf-8', errors="ignore").strip()
     
     if not force:
+        continue
+        
+    if (not acceleration or not rotation):
         continue
     
     x = float(force)
