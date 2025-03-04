@@ -1,0 +1,145 @@
+
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.25, Y: 9.64, Z: -0.10 m/s^2
+Force: 0.18
+Rotation X: -0.04, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.18, Y: 9.70, Z: -0.12 m/s^2
+Force: 0.55
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.19, Y: 9.66, Z: -0.12 m/s^2
+Force: 1.18
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.23, Y: 9.69, Z: -0.06 m/s^2
+Force: 1.92
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.26, Y: 9.70, Z: -0.18 m/s^2
+Force: 2.72
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.32, Y: 9.66, Z: -0.14 m/s^2
+Force: 3.51
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.20, Y: 9.65, Z: -0.13 m/s^2
+Force: 4.16
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.21, Y: 9.67, Z: -0.05 m/s^2
+Force: 4.90
+Rotation X: -0.06, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.20, Y: 9.62, Z: -0.12 m/s^2
+Force: 5.53
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.27, Y: 9.69, Z: -0.18 m/s^2
+Force: 6.20
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.27, Y: 9.66, Z: -0.11 m/s^2
+Force: 6.89
+Rotation X: -0.06, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.22, Y: 9.73, Z: -0.08 m/s^2
+Force: 7.47
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.18, Y: 9.74, Z: -0.05 m/s^2
+Force: 8.19
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.21, Y: 9.62, Z: -0.14 m/s^2
+Force: 8.84
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.30, Y: 9.68, Z: -0.06 m/s^2
+Force: 9.48
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.13, Y: 9.62, Z: -0.11 m/s^2
+Force: 9.61
+Rotation X: -0.05, Y: -0.00, Z: 0.03 rad/s
+Acceleration X: -0.16, Y: 9.77, Z: -0.03 m/s^2
+Force: 9.65
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.10, Y: 9.69, Z: -0.25 m/s^2
+Force: 9.69
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.17, Y: 9.62, Z: -0.15 m/s^2
+Force: 9.69
+Rotation X: -0.06, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.12, Y: 9.72, Z: -0.32 m/s^2
+Force: 9.74
+Rotation X: -0.04, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.06, Y: 9.79, Z: -0.29 m/s^2
+Force: 9.78
+Rotation X: -0.04, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.10, Y: 10.01, Z: -0.35 m/s^2
+Force: 9.82
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: 0.21, Y: 9.95, Z: -0.32 m/s^2
+Force: 9.78
+Rotation X: -0.04, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.13, Y: 9.67, Z: -0.14 m/s^2
+Force: 9.19
+Rotation X: -0.05, Y: -0.00, Z: 0.04 rad/s
+Acceleration X: -0.22, Y: 9.74, Z: -0.23 m/s^2
+Force: 8.33
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.26, Y: 9.70, Z: -0.17 m/s^2
+Force: 7.53
+Rotation X: -0.04, Y: -0.00, Z: 0.03 rad/s
+Acceleration X: -0.08, Y: 9.77, Z: -0.22 m/s^2
+Force: 6.67
+Rotation X: -0.06, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.49, Y: 9.94, Z: -0.11 m/s^2
+Force: 5.82
+Rotation X: -2.96, Y: 0.00, Z: 0.03 rad/s
+Acceleration X: -67.06, Y: 0.00, Z: 1.23 m/s^2
+Force: 4.90
+Rotation X: -0.06, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.45, Y: 9.51, Z: -0.01 m/s^2
+Force: 4.04
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.10, Y: 9.39, Z: -0.14 m/s^2
+Force: 3.23
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.32, Y: 9.53, Z: 0.07 m/s^2
+Force: 2.61
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.24, Y: 9.56, Z: -0.03 m/s^2
+Force: 2.08
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.18, Y: 9.63, Z: -0.10 m/s^2
+Force: 1.49
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.22, Y: 9.71, Z: -0.17 m/s^2
+Force: 0.89
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.26, Y: 9.67, Z: -0.09 m/s^2
+Force: 0.31
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.20, Y: 9.67, Z: -0.18 m/s^2
+Force: 0.16
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.16, Y: 9.73, Z: -0.16 m/s^2
+Force: 0.15
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.16, Y: 9.66, Z: -0.15 m/s^2
+Force: 0.13
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.26, Y: 9.70, Z: -0.20 m/s^2
+Force: 0.14
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.19, Y: 9.67, Z: -0.13 m/s^2
+Force: 0.12
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.18, Y: 9.62, Z: -0.04 m/s^2
+Force: 0.11
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.17, Y: 9.71, Z: -0.05 m/s^2
+Force: 0.11
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.25, Y: 9.74, Z: -0.16 m/s^2
+Force: 0.10
+Rotation X: -0.06, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.19, Y: 9.68, Z: -0.14 m/s^2
+Force: 0.10
+Rotation X: -0.05, Y: -0.01, Z: 0.04 rad/s
+Acceleration X: -0.24, Y: 9.67, Z: -0.20 m/s^2
+Force: 0.10
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.20, Y: 9.70, Z: -0.11 m/s^2
+Force: 0.09
+Rotation X: -0.05, Y: -0.01, Z: 0.03 rad/s
+Acceleration X: -0.27, Y: 9.66, Z: -0.11 m/s^2
+Force: 0.09
