@@ -1,0 +1,36 @@
+import serial
+import time
+
+arduino = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+time.sleep(2)
+
+f = open("imu_data.txt", "a")
+
+start_time = time.time() 
+
+x = 0
+
+while x < 13:
+	acceleration = arduino.readline().decode('utf-8', errors="ignore").rstrip()
+	rotation = arduino.readline().decode('utf-8', errors="ignore").rstrip()
+	
+	if (not acceleration or not rotation):
+		continue
+		
+	cur_time = time.time()  # Get current time at the end
+	elapsed_time = (cur_time - start_time)/1000
+	
+	start_time = cur_time
+	
+	print(f"{elapsed_time:.6f}")
+	print(rotation)
+	print(acceleration)
+	
+	f.write(f"\n{elapsed_time:.6f}")
+	f.write("\n"+rotation)
+	f.write("\n"+acceleration+"\n")
+	
+	x += 1
+	
+    
+f.close()
