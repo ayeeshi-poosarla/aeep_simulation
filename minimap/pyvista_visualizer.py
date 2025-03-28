@@ -67,7 +67,7 @@ def main():
 
     # Create a PyVista plotter
     plotter = pv.Plotter()
-    plotter.set_scale(xscale = 0.00001, yscale = 0.00001, zscale = 0.00001)
+    #plotter.set_scale(xscale = 0.00001, yscale = 0.00001, zscale = 0.00001)
 
     # Add the mesh to the plotter
     plotter.add_mesh(mesh, color="white", show_edges=True, opacity = 0.25)
@@ -89,7 +89,7 @@ def main():
         nonlocal frame
         if frame < len(coordinates):
             coords = coordinates[frame]
-            x, y, z = float(coords[0]), float(coords[1]), float(coords[2])
+            x, y, z = float(coords[0]) * 10000, float(coords[1]) * 10000, float(coords[2]) * 10000
             marker.points = np.array([[x, y, z]])
             plotter.render()
             frame += 1
