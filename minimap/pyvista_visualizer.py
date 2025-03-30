@@ -89,7 +89,7 @@ def main():
         nonlocal frame
         if frame < len(coordinates):
             coords = coordinates[frame]
-            x, y, z = float(coords[0]) * 10000, float(coords[1]) * 10000, float(coords[2]) * 10000
+            x, y, z = float(coords[0]) * 1000, float(coords[1]) * 1000, float(coords[2]) * 1000
             marker.points = np.array([[x, y, z]])
             plotter.render()
             frame += 1
