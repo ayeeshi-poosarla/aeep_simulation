@@ -1,36 +1,59 @@
 import serial
 import time
 
-arduino = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-time.sleep(2)
+def read_imu_data(port='COM6', baud_rate=115200, num_samples=24, output_file="imu_data.txt"):
+    """Reads IMU data from a serial port and writes it to a file.
 
-f = open("imu_data.txt", "a")
+    Args:
+        port (str): The serial port to connect to (e.g., 'COM6' or '/dev/ttyUSB0').
+        baud_rate (int): Baud rate for serial communication.
+        num_samples (int): Number of readings to collect.
+        output_file (str): File to save the data.
 
-start_time = time.time() 
-
-x = 0
-
-while x < 13:
-	acceleration = arduino.readline().decode('utf-8', errors="ignore").rstrip()
-	rotation = arduino.readline().decode('utf-8', errors="ignore").rstrip()
-	
-	if (not acceleration or not rotation):
-		continue
-		
-	cur_time = time.time()  # Get current time at the end
-	elapsed_time = (cur_time - start_time)/1000
-	
-	start_time = cur_time
-	
-	print(f"{elapsed_time:.6f}")
-	print(rotation)
-	print(acceleration)
-	
-	f.write(f"\n{elapsed_time:.6f}")
-	f.write("\n"+rotation)
-	f.write("\n"+acceleration+"\n")
-	
-	x += 1
-	
+    Returns:
+        list: A list of collected IMU data strings.
+    """
+    data_buffer = []
     
-f.close()
+    with serial.Serial('COM6', 115200) as arduino:
+        time.sleep(2)
+    
+        start_time = time.perf_counter()
+    
+        x = 0
+    
+        while x < 100:
+            arduino.reset_input_buffer()
+            
+            inline = arduino.readline().decode('utf-8', errors="ignore").rstrip()
+            #print(inline)
+            
+            if "  " not in inline:
+                continue  # Skip invalid lines
+            
+            acceleration, rotation = inline.split("  ")
+    
+            #if not acceleration or not rotation:
+                #continue
+    
+            cur_time = time.perf_counter()  # Get precise current time
+            elapsed_time = (cur_time - start_time)  # Convert to milliseconds
+            start_time = cur_time;
+            print(f"{elapsed_time:.6f} s")
+            print(rotation)
+            print(acceleration)
+    
+            data_buffer.append(f"{elapsed_time:.6f} s\n{rotation}\n{acceleration}\n")
+    
+            x += 1
+    
+    with open("imu_data.txt", "w") as f:
+        f.writelines(data_buffer)
+        
+    return data_buffer
+
+def main():
+    read_imu_data();
+
+if __name__ == "__main__":
+    main()
