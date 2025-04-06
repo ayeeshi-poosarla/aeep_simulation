@@ -62,6 +62,7 @@ class MadgwickFilter:
         q2q2 = q2 * q2
         q3q3 = q3 * q3
         q4q4 = q4 * q4
+        q2q4 = q2 * q4
 
         # Reference direction of Earth's magnetic field
         hx = mag[0] * (q1q1 + q2q2 - q3q3 - q4q4) + 2.0 * mag[1] * (q2 * q3 - q1 * q4) + 2.0 * mag[2] * (q2 * q4 + q1 * q3)
