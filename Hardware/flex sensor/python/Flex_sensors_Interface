@@ -1,0 +1,49 @@
+import serial
+import time
+
+def read_flex_data(port='COM6', baud_rate=9600, num_samples=100, output_file="imu_data.txt"):
+    
+    data_buffer = []
+    
+    with serial.Serial('COM6', baud_rate) as arduino:
+        time.sleep(2)
+    
+        start_time = time.perf_counter()
+    
+        x = 0
+    
+        while x < num_samples:
+            arduino.reset_input_buffer()
+            
+            inline = arduino.readline().decode('utf-8', errors="ignore").rstrip()
+            #print(inline)
+            
+            if "  " not in inline:
+                continue  # Skip invalid lines
+            
+            acceleration, rotation = inline.split("  ")
+    
+            #if not acceleration or not rotation:
+                #continue
+    
+            cur_time = time.perf_counter()  # Get precise current time
+            elapsed_time = (cur_time - start_time)
+            start_time = cur_time;
+            print(f"{elapsed_time:.6f} s")
+            print(rotation)
+            print(acceleration)
+    
+            data_buffer.append(f"{elapsed_time:.6f} s\n{rotation}\n{acceleration}\n")
+    
+            x += 1
+    
+    with open("imu_data.txt", "w") as f:
+        f.writelines(data_buffer)
+        
+    return data_buffer
+
+def main():
+    read_flex_data();
+
+if __name__ == "__main__":
+    main()
