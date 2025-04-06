@@ -67,8 +67,7 @@ def positional():
 
     initial_position = [0.5 * accelerations[0][0] * (initial_time**2), 
         0.5 * accelerations[0][1] * (initial_time**2), 0.5 * accelerations[0][2] * (initial_time**2)]
-    f.write(' '.join(map(str, initial_position)))
-    f.write("\n")
+        
 
     for i in range(1, len(times)):
         time = times[i]
@@ -171,6 +170,6 @@ def run():
 
     # Optional: print all the vectors
     length = 0.25
-    for i in range(len(times)):
+    for i in range(len(times) - 1):
         compute_coords(i, position_vectors[i], length, times[i])
 run()
