@@ -124,51 +124,72 @@ class MadgwickFilter:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    # Suppose you have arrays of sensor data recorded from your 9-DOF IMU.
-    # Here we simulate some dummy data for demonstration.
-    # (In practice, replace these with your actual data arrays.)
-    n_samples = 200
-    sample_period = 1 / 256  # for example, 256 Hz sample rate
-    times = np.linspace(0, (n_samples - 1) * sample_period, n_samples)
-    
-    # Simulated sensor readings:
-    # For a static tool (no rotation), gyroscope outputs zeros.
-    gyro_data = np.zeros((n_samples, 3))
-    # Accelerometer: assume the sensor is stationary with gravity acting along Z.
-    # (If your sensor outputs m/s^2, gravity ≈ 9.81 m/s^2; here we use a unit vector.)
-    accel_data = np.tile(np.array([0.0, 0.0, 1.0]), (n_samples, 1))
-    # Magnetometer: assume a constant Earth magnetic field vector in sensor frame.
-    mag_data = np.tile(np.array([0.5, 0.0, 0.0]), (n_samples, 1))
+    data = pd.read_csv('extracted_sensor_data.csv')
 
-    # Initialize the filter
-    madgwick = MadgwickFilter(sample_period=sample_period, beta=0.1)
+    times = data['Timestamp'].to_numpy()
+    N = len(times)
+    dt_array = np.diff(times, prepend=times[0])
+    gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
+    accel_data = data[['Accel_X', 'Accel_Y', 'Accel_Z']].to_numpy()
+    mag_data = data[['Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
+
+    quaternions = np.zeros((N, 4))
+    euler_angles = np.zeros((N, 3))  # yaw, pitch, roll
+    global_acc = np.zeros((N, 3))
+    velocity = np.zeros((N, 3))
+    position = np.zeros((N, 3))
+
+    avg_dt = np.mean(dt_array)
+    madgwick = MadgwickFilter(sample_period=avg_dt, beta=0.1)
 
     # Arrays to store orientation (Euler angles) at each time step
     yaw_list = []
     pitch_list = []
     roll_list = []
 
-    # Process each sensor sample
-    for i in range(n_samples):
-        q = madgwick.update(gyro=gyro_data[i],
-                            accel=accel_data[i],
-                            mag=mag_data[i])
-        yaw, pitch, roll = madgwick.get_euler()
-        yaw_list.append(yaw)
-        pitch_list.append(pitch)
-        roll_list.append(roll)
+    for i in range(N):
+        # Update the sample period for current time step
+        current_dt = dt_array[i] if dt_array[i] > 0 else avg_dt
+        madgwick.sample_period = current_dt
 
-    # Build a DataFrame with the results
-    df_results = pd.DataFrame({
-        'Time (s)': times,
-        'Yaw (deg)': yaw_list,
-        'Pitch (deg)': pitch_list,
-        'Roll (deg)': roll_list
-    })
+        # Update the filter with current sensor data
+        q = madgwick.update(gyro=gyro_data[i], accel=accel_data[i], mag=mag_data[i])
+        quaternions[i] = q
+        euler_angles[i] = madgwick.get_euler()
+        
+        # Get rotation matrix and rotate accelerometer vector to global frame
+        R = madgwick.get_rotation_matrix()
+        global_acc[i] = R @ accel_data[i]
+        
+        # Integrate to compute velocity and position (using Euler integration)
+        if i > 0:
+            dt = dt_array[i]
+            velocity[i] = velocity[i-1] + global_acc[i-1] * dt
+            position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i-1] * dt**2
 
-    # Display the first few rows
-    print(df_results.head())
+    # --- Step 5: Compute Displacement ---
+    overall_displacement = np.linalg.norm(position[-1] - position[0])
+    cumulative_disp = np.zeros(N)
+    for i in range(1, N):
+        step_disp = np.linalg.norm(position[i] - position[i-1])
+        cumulative_disp[i] = cumulative_disp[i-1] + step_disp
 
-    # Optionally, save or further process the DataFrame.
-    # For example, you might write it to a CSV file:
-    # df_results.to_csv("orientation_results.csv", index=False)
+    print("Overall displacement (net):", overall_displacement)
+    
+    # --- Step 6: Store Results in a DataFrame ---
+    data['yaw_deg'] = euler_angles[:, 0]
+    data['pitch_deg'] = euler_angles[:, 1]
+    data['roll_deg'] = euler_angles[:, 2]
+
+    data['vel_x'] = velocity[:, 0]
+    data['vel_y'] = velocity[:, 1]
+    data['vel_z'] = velocity[:, 2]
+
+    data['pos_x'] = position[:, 0]
+    data['pos_y'] = position[:, 1]
+    data['pos_z'] = position[:, 2]
+
+    data['cumulative_displacement'] = cumulative_disp
+
+    # Save to a new CSV if desired
+    data.to_csv('fusion_displacement_results.csv', index=False)
