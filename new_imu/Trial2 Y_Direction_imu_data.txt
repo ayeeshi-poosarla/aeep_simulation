@@ -1,0 +1,96 @@
+0.071687 s
+Accel X: 106.86 Y: 0.00 Z: -8.87 m/s^2 
+Mag X: -2256.20 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.107101 s
+Accel X: -146.49 Y: 0.15 Z: -8.87 m/s^2 
+Mag X: -2400.20 Y: -519.85 Z: -301.60uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.105987 s
+Accel X: -146.49 Y: 0.15 Z: 135.36 m/s^2 
+Mag X: 3470.20 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.105187 s
+Accel X: -33.64 Y: 0.00 Z: -8.77 m/s^2 
+Mag X: -2289.80 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 18.36 Z: 0.00radians/s
+0.106399 s
+Accel X: -146.49 Y: 0.15 Z: -8.87 m/s^2 
+Mag X: -2256.20 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.110274 s
+Accel X: 34.54 Y: 0.00 Z: -8.87 m/s^2 
+Mag X: 3398.20 Y: -519.70 Z: -301.60uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.108473 s
+Accel X: -148.11 Y: 0.00 Z: -135.54 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.54 Y: 17.80 Z: 0.00radians/s
+0.102656 s
+Accel X: -110.88 Y: 0.00 Z: -8.77 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.117349 s
+Accel X: -146.49 Y: 0.15 Z: 135.36 m/s^2 
+Mag X: 3470.20 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.096653 s
+Accel X: -146.49 Y: 0.15 Z: 135.36 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.105099 s
+Accel X: -48.36 Y: 0.00 Z: -73.67 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.03 Y: 17.80 Z: 0.00radians/s
+0.105709 s
+Accel X: -59.40 Y: 0.00 Z: -8.77 m/s^2 
+Mag X: -2289.80 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 18.36 Z: 0.00radians/s
+0.106713 s
+Accel X: -146.49 Y: 0.15 Z: 135.36 m/s^2 
+Mag X: 3470.20 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.106315 s
+Accel X: 86.03 Y: 0.00 Z: -8.77 m/s^2 
+Mag X: 633.40 Y: -519.70 Z: -301.60uT 
+Gyro X: 0.00 Y: 18.36 Z: 0.00radians/s
+0.111012 s
+Accel X: 99.51 Y: 0.00 Z: -8.77 m/s^2 
+Mag X: 95.80 Y: -519.70 Z: -301.60uT 
+Gyro X: 0.00 Y: 18.36 Z: 0.00radians/s
+0.108560 s
+Accel X: -146.49 Y: 0.15 Z: 135.36 m/s^2 
+Mag X: 3470.20 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.103501 s
+Accel X: -146.49 Y: 0.15 Z: 135.36 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.110485 s
+Accel X: -69.20 Y: 0.00 Z: 135.36 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.113017 s
+Accel X: -69.20 Y: 0.00 Z: 135.36 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.00 Y: 17.80 Z: 0.00radians/s
+0.106636 s
+Accel X: -108.42 Y: 0.00 Z: -8.87 m/s^2 
+Mag X: -2256.20 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.106403 s
+Accel X: -146.49 Y: 0.15 Z: -8.77 m/s^2 
+Mag X: -2289.80 Y: -505.60 Z: -301.60uT 
+Gyro X: 0.00 Y: 18.36 Z: 0.00radians/s
+0.106687 s
+Accel X: 84.80 Y: 0.00 Z: -8.87 m/s^2 
+Mag X: -2256.20 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.105835 s
+Accel X: -29.20 Y: 0.00 Z: -8.87 m/s^2 
+Mag X: -2256.20 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.24 Y: 18.36 Z: 0.00radians/s
+0.106513 s
+Accel X: 76.22 Y: 0.00 Z: -99.95 m/s^2 
+Mag X: 3503.80 Y: -505.60 Z: -340.00uT 
+Gyro X: 0.54 Y: 17.80 Z: 0.00radians/s
