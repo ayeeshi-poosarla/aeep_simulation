@@ -180,8 +180,8 @@ if __name__ == '__main__':
         # Integrate to compute velocity and position (using Euler integration)
         if i > 0:
             dt = times[i]
-            velocity[i] = velocity[i-1] + global_acc[i-1] * dt
-            position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i-1] * dt**2
+            velocity[i] = velocity[i-1] + global_acc[i] * dt
+            position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i] * dt**2
 
     # --- Step 5: Compute Displacement ---
     overall_displacement = np.linalg.norm(position[-1] - position[0])
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     data['cumulative_displacement'] = cumulative_disp
 
-    print("Overall displacement (net):", data['cumulative_displacement'][-1])
+    print("Overall displacement (net):", data['cumulative_displacement'].iloc[-1])
 
     # Save to a new CSV if desired
     data.to_csv('Trial1_X_fusion.csv', index=False)
