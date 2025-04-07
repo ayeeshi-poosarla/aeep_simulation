@@ -76,7 +76,8 @@ def main():
     frame = 0
     
     # Define the threshold force that triggers the red glow (5N)
-    force_threshold = 5.0
+    force_threshold1 = 5.0
+    force_threshold2 = 10.0
     
     def update_position(caller, timer_id):
         nonlocal frame
@@ -87,15 +88,15 @@ def main():
             marker.points = np.array([current_position])
             
             # Generate random force value between 0 and 10N for testing
-            current_force = random.uniform(0, 10)
+            current_force = random.uniform(0, 20)
             
             # Update force display text
             plotter.textActor.SetText(0, f"Force: {current_force:.2f} N")
             
             # Check if force exceeds threshold
-            if current_force > force_threshold:
+            if current_force > force_threshold2:
                 # Make the mesh glow red with intensity proportional to force
-                intensity = min(1.0, current_force / 10.0)  # Normalize to 0-1 range
+                intensity = min(1.0, current_force / 20.0)  # Normalize to 0-1 range
                 # Brighter red for higher forces
                 red_value = min(255, 150 + int(105 * intensity))
                 color = (red_value/255, 0, 0)
@@ -104,10 +105,20 @@ def main():
                 mesh_actor.GetProperty().SetColor(color)
                 mesh_actor.GetProperty().SetOpacity(0.5 + 0.3*intensity)
                 mesh_actor.GetProperty().SetAmbient(0.5 + 0.5*intensity)
+            elif current_force > force_threshold1:
+                intensity = min(1.0, current_force / 20.0)  # Normalize to 0-1 range
+                # Brighter yellow for higher forces
+                yellow_value = min(255, 150 + int(105 * intensity))
+                color = (yellow_value/255, yellow_value/255, 0)  # Yellow is (R,G,0)
+    
+    # Increase opacity and ambient lighting for glow effect
+                mesh_actor.GetProperty().SetColor(color)
+                mesh_actor.GetProperty().SetOpacity(0.5 + 0.3*intensity)
+                mesh_actor.GetProperty().SetAmbient(0.5 + 0.5*intensity)
 
             else:
                 # Return to normal appearance
-                mesh_actor.GetProperty().SetColor((1.0, 1.0, 1.0))
+                mesh_actor.GetProperty().SetColor((1, 1, 1))
                 mesh_actor.GetProperty().SetOpacity(0.5)
                 mesh_actor.GetProperty().SetAmbient(0.0)
             
