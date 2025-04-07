@@ -116,11 +116,26 @@ class MadgwickFilter:
         roll = np.arctan2(2*(q[0]*q[3] + q[1]*q[2]),
                           1 - 2*(q[2]*q[2] + q[3]*q[3]))
         return np.degrees(yaw), np.degrees(pitch), np.degrees(roll)
+    
+    def get_rotation_matrix(self):
+        """
+        Returns the 3x3 rotation matrix corresponding to the current quaternion.
+        """
+        q = self.q
+        # Compute the rotation matrix elements
+        r11 = 1 - 2*(q[2]**2 + q[3]**2)
+        r12 = 2*(q[1]*q[2] - q[0]*q[3])
+        r13 = 2*(q[1]*q[3] + q[0]*q[2])
+        r21 = 2*(q[1]*q[2] + q[0]*q[3])
+        r22 = 1 - 2*(q[1]**2 + q[3]**2)
+        r23 = 2*(q[2]*q[3] - q[0]*q[1])
+        r31 = 2*(q[1]*q[3] - q[0]*q[2])
+        r32 = 2*(q[2]*q[3] + q[0]*q[1])
+        r33 = 1 - 2*(q[1]**2 + q[2]**2)
+        return np.array([[r11, r12, r13],
+                         [r21, r22, r23],
+                         [r31, r32, r33]])
 
-
-# =============================================================================
-# Example usage: Data fusion and storing results in a DataFrame
-# =============================================================================
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
