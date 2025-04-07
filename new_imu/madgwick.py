@@ -188,8 +188,6 @@ if __name__ == '__main__':
     for i in range(1, N):
         step_disp = np.linalg.norm(position[i] - position[i-1])
         cumulative_disp[i] = cumulative_disp[i-1] + step_disp
-
-    print("Overall displacement (net):", overall_displacement)
     
     # --- Step 6: Store Results in a DataFrame ---
     data['yaw_deg'] = euler_angles[:, 0]
@@ -205,6 +203,8 @@ if __name__ == '__main__':
     data['pos_z'] = position[:, 2]
 
     data['cumulative_displacement'] = cumulative_disp
+
+    print("Overall displacement (net):", data['cumulative_displacement'].sum())
 
     # Save to a new CSV if desired
     data.to_csv('fusion_displacement_results.csv', index=False)
