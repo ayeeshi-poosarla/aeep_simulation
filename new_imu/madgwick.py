@@ -139,11 +139,10 @@ class MadgwickFilter:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    data = pd.read_csv('Trial1_X_extracted.csv')
+    data = pd.read_csv('Trial2_X_extracted.csv')
     data.head()
 
     times = data['Timestamp'].to_numpy()
-    print(times)
     N = len(times)
     gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
     accel_data = data[['Accel_X', 'Accel_Y', 'Accel_Z']].to_numpy()
@@ -208,4 +207,4 @@ if __name__ == '__main__':
     print("Overall displacement (net):", data['cumulative_displacement'].iloc[-1])
 
     # Save to a new CSV if desired
-    data.to_csv('Trial1_X_fusion.csv', index=False)
+    data.to_csv('Trial2_X_fusion.csv', index=False)
