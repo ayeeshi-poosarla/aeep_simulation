@@ -139,11 +139,12 @@ class MadgwickFilter:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    data = pd.read_csv('extracted_sensor_data.csv')
+    data = pd.read_csv('Trial1_X_extracted.csv')
+    data.head()
 
     times = data['Timestamp'].to_numpy()
+    print(times)
     N = len(times)
-    dt_array = np.diff(times, prepend=times[0])
     gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
     accel_data = data[['Accel_X', 'Accel_Y', 'Accel_Z']].to_numpy()
     mag_data = data[['Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
@@ -154,7 +155,7 @@ if __name__ == '__main__':
     velocity = np.zeros((N, 3))
     position = np.zeros((N, 3))
 
-    avg_dt = np.mean(dt_array)
+    avg_dt = np.mean(times)
     madgwick = MadgwickFilter(sample_period=avg_dt, beta=0.1)
 
     # Arrays to store orientation (Euler angles) at each time step
@@ -164,7 +165,7 @@ if __name__ == '__main__':
 
     for i in range(N):
         # Update the sample period for current time step
-        current_dt = dt_array[i] if dt_array[i] > 0 else avg_dt
+        current_dt = times[i] if times[i] > 0 else avg_dt
         madgwick.sample_period = current_dt
 
         # Update the filter with current sensor data
@@ -178,7 +179,7 @@ if __name__ == '__main__':
         
         # Integrate to compute velocity and position (using Euler integration)
         if i > 0:
-            dt = dt_array[i]
+            dt = times[i]
             velocity[i] = velocity[i-1] + global_acc[i-1] * dt
             position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i-1] * dt**2
 
@@ -204,7 +205,7 @@ if __name__ == '__main__':
 
     data['cumulative_displacement'] = cumulative_disp
 
-    print("Overall displacement (net):", data['cumulative_displacement'].sum())
+    print("Overall displacement (net):", data['cumulative_displacement'][-1])
 
     # Save to a new CSV if desired
-    data.to_csv('fusion_displacement_results.csv', index=False)
+    data.to_csv('Trial1_X_fusion.csv', index=False)
