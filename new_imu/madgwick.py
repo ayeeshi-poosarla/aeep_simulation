@@ -181,7 +181,7 @@ if __name__ == '__main__':
         if i > 0:
             dt = times[i]
             velocity[i] = velocity[i-1] + global_acc[i] * dt
-            position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i] * dt**2
+            position[i] = velocity[i-1] * dt + 0.5 * global_acc[i] * dt**2
 
     # --- Step 5: Compute Displacement ---
     overall_displacement = np.linalg.norm(position[-1] - position[0])
