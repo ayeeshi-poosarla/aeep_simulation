@@ -136,6 +136,18 @@ class MadgwickFilter:
                          [r21, r22, r23],
                          [r31, r32, r33]])
 
+def calibrate_magnetometer(mag_data):
+    calibrated_mag_data = np.zeros_like(mag_data)
+    B = [109.06238802, 37.90448955, 125.2127988]
+    A_inv = [[2.58891148, 0.03830976, -0.05865281],[0.03830976, 2.79695092, 0.03519644], [-0.05865281, 0.03519644, 2.72060039]]
+
+    for i in range(mag_data.shape[0]):
+        # Subtract hard iron bias
+        mag_data[i] = mag_data[i] - B
+        # Apply soft iron transformation
+        calibrated_mag_data[i] = np.dot(mag_data[i], A_inv)
+    return calibrated_mag_data
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
@@ -148,9 +160,10 @@ if __name__ == '__main__':
     N = len(times)
     gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
     # gyro_data = np.column_stack((np.zeros(N), np.zeros(N), np.zeros(N)))
-    accel_data = np.column_stack((np.zeros(N), data['Accel_Y'] - df['Accel_Y'].iloc[0], np.zeros(N)))
-    print("accel_data", accel_data)
+    # accel_data = np.column_stack((np.zeros(N), data['Accel_Y'] - df['Accel_Y'].iloc[0], np.zeros(N)))
+    accel_data = np.column_stack((data['Accel_X'] - df['Accel_X'].iloc[0], data['Accel_Y'] - df['Accel_Y'].iloc[0], data['Accel_Z'] - df['Accel_Z'].iloc[0]))
     mag_data = data[['Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
+    mag_data = calibrate_magnetometer(mag_data)
 
     quaternions = np.zeros((N, 4))
     euler_angles = np.zeros((N, 3))  # yaw, pitch, roll
@@ -208,7 +221,7 @@ if __name__ == '__main__':
 
     data['cumulative_displacement'] = cumulative_disp
 
-    print(data.tail())
+    # print(data.tail())
 
     print("Overall displacement (net):", data['cumulative_displacement'].iloc[-1])
 
