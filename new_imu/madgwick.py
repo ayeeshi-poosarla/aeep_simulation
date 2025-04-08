@@ -139,13 +139,17 @@ class MadgwickFilter:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    data = pd.read_csv('Trial2_X_extracted.csv')
-    data.head()
+    df = pd.read_csv('Trial1_Y_extracted.csv')
+    mask = df['Mag_X'] < -1500
+    start_index = df[mask].index[0]
+    data = df.loc[start_index:]
 
     times = data['Timestamp'].to_numpy()
     N = len(times)
     gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
-    accel_data = data[['Accel_X', 'Accel_Y', 'Accel_Z']].to_numpy()
+    # gyro_data = np.column_stack((np.zeros(N), np.zeros(N), np.zeros(N)))
+    accel_data = np.column_stack((np.zeros(N), data['Accel_Y'] - df['Accel_Y'].iloc[0], np.zeros(N)))
+    print("accel_data", accel_data)
     mag_data = data[['Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
 
     quaternions = np.zeros((N, 4))
@@ -204,7 +208,9 @@ if __name__ == '__main__':
 
     data['cumulative_displacement'] = cumulative_disp
 
+    print(data.tail())
+
     print("Overall displacement (net):", data['cumulative_displacement'].iloc[-1])
 
     # Save to a new CSV if desired
-    data.to_csv('Trial2_X_fusion.csv', index=False)
+    data.to_csv('Trial1_Y_fusion.csv', index=False)
