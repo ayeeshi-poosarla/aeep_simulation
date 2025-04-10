@@ -10,7 +10,7 @@ def main():
     df = []
     time_above_pressure_thresh = 0
     time_threshold = 3.0
-    force_threshold = 10.0 # bennett pls fix
+    force_threshold = 10.0
   
     x_min = -75.485
     x_max = 75.485
