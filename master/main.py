@@ -1,9 +1,9 @@
 # main.py
 import dof9_filter
 import dof9_parser
-import force_analysis
-import force_reader
-import imu_reader
+from force_analysis import force_analysis
+from force_reader import read_flex_data
+from imu_reader import read_imu_data
 import pyvista as pv
 import numpy as np
 import random
@@ -161,7 +161,7 @@ def main():
       z_min <= z <= z_max
     ):
         imu_outputs = read_imu_data()
-        bend_values = force_reader()
+        bend_values = read_flex_data()
         # coordinates = madgwick(imu_outputs)
 
         
