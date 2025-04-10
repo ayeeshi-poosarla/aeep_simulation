@@ -1,13 +1,17 @@
 # main.py
-import dof9_filter.py
-import dof9_parser.py
-import force_analysis.py
-import force_reader.py
-import imu_reader.py
+import dof9_filter
+import dof9_parser
+import force_analysis
+import force_reader
+import imu_reader
+import pyvista as pv
+import numpy as np
+import random
 
 def main():
     # Replace with the path to your STL file
     stl_file = "bph_mold_combined.stl"
+
     
     # Load the STL file
     mesh = pv.read(stl_file)
@@ -39,7 +43,7 @@ def main():
     border_lines = pv.PolyData()
     
     # Read coordinates from file
-    coordinate_file = "minimap/coordinates.txt"
+    coordinate_file = "coordinates.txt"
     with open(coordinate_file) as f:
         coordinates = [
             line.strip().replace('[','').replace(']','').replace(',','').split() 
@@ -82,55 +86,50 @@ def main():
     force_threshold1 = 5.0
     force_threshold2 = 10.0
     
-    def update_position(caller, timer_id):
-        nonlocal frame
+
+    def update_position(frame, coordinates, marker):
         if frame < len(coordinates):
             coords = coordinates[frame]
             x, y, z = float(coords[0]) * 1000, float(coords[1]) * 1000, float(coords[2]) * 1000
             current_position = np.array([x, y, z])
             marker.points = np.array([current_position])
-            
-            # Generate random force value between 0 and 10N for testing
-            current_force = random.uniform(0, 20)
-            
-            # Update force display text
-            plotter.textActor.SetText(0, f"Force: {current_force:.2f} N")
-            
-            # Check if force exceeds threshold
-            if current_force > force_threshold2:
-                # Make the mesh glow red with intensity proportional to force
-                intensity = min(1.0, current_force / 20.0)  # Normalize to 0-1 range
-                # Brighter red for higher forces
-                red_value = min(255, 150 + int(105 * intensity))
-                color = (red_value/255, 0, 0)
-                
-                # Increase opacity and ambient lighting for glow effect
-                mesh_actor.GetProperty().SetColor(color)
-                mesh_actor.GetProperty().SetOpacity(0.5 + 0.3*intensity)
-                mesh_actor.GetProperty().SetAmbient(0.5 + 0.5*intensity)
-            elif current_force > force_threshold1:
-                intensity = min(1.0, current_force / 20.0)  # Normalize to 0-1 range
-                # Brighter yellow for higher forces
-                yellow_value = min(255, 150 + int(105 * intensity))
-                color = (yellow_value/255, yellow_value/255, 0)  # Yellow is (R,G,0)
-    
-                # Increase opacity and ambient lighting for glow effect
-                mesh_actor.GetProperty().SetColor(color)
-                mesh_actor.GetProperty().SetOpacity(0.5 + 0.3*intensity)
-                mesh_actor.GetProperty().SetAmbient(0.5 + 0.5*intensity)
 
-            else:
-                # Return to normal appearance
-                mesh_actor.GetProperty().SetColor((1, 1, 1))
-                mesh_actor.GetProperty().SetOpacity(0.5)
-                mesh_actor.GetProperty().SetAmbient(0.0)
-            
-            mesh_actor.Modified()
-            plotter.render()
-            frame += 1
+            # Simulate force reading
+            current_force = random.uniform(0, 20)
+            return current_force
+        return None
+    
+    def update_mesh_color(force, mesh_actor, plotter, force_threshold1, force_threshold2):
+        # Update force display text
+        plotter.textActor.SetText(0, f"Force: {force:.2f} N")
+
+        if force > force_threshold2:
+            intensity = min(1.0, force / 20.0)
+            red_value = min(255, 150 + int(105 * intensity))
+            color = (red_value/255, 0, 0)
+
+            mesh_actor.GetProperty().SetColor(color)
+            mesh_actor.GetProperty().SetOpacity(0.5 + 0.3*intensity)
+            mesh_actor.GetProperty().SetAmbient(0.5 + 0.5*intensity)
+
+        elif force > force_threshold1:
+            intensity = min(1.0, force / 20.0)
+            yellow_value = min(255, 150 + int(105 * intensity))
+            color = (yellow_value/255, yellow_value/255, 0)
+
+            mesh_actor.GetProperty().SetColor(color)
+            mesh_actor.GetProperty().SetOpacity(0.5 + 0.3*intensity)
+            mesh_actor.GetProperty().SetAmbient(0.5 + 0.5*intensity)
+
         else:
-            # Reset to start when all frames are processed
-            frame = 0
+            mesh_actor.GetProperty().SetColor((1, 1, 1))
+            mesh_actor.GetProperty().SetOpacity(0.5)
+            mesh_actor.GetProperty().SetAmbient(0.0)
+
+        mesh_actor.Modified()
+        plotter.render()
+
+
     
     # Set up the timer
     plotter.iren.add_observer('TimerEvent', update_position)
@@ -151,19 +150,24 @@ def main():
     z_min = -63.0095
     z_max = 63.0095
   
+    x = 0
+    y = 0
+    z = 0
+    dt = 0.01 
+
     while (
       x_min <= x <= x_max and
       y_min <= y <= y_max and
       z_min <= z <= z_max
     ):
-        imu_outputs = IMU_reader()
+        imu_outputs = read_imu_data()
         bend_values = force_reader()
-        coordinates = madgwick(imu_outputs)
+        # coordinates = madgwick(imu_outputs)
 
         
         pressure = force_analysis(bend_values)
       
-        update_position(coordinates) # update point on minimap
+        update_position() # update point on minimap
 
         # force thresholding
 
@@ -173,7 +177,7 @@ def main():
             time_above_pressure_thresh = 0
 
         if time_above_pressure_thresh > time_threshold:
-            change_color()
+            update_mesh_color(pressure, mesh_actor, plotter, force_threshold1, force_threshold2)
 
         N, S, E, W = force_reader()
         data = {dt, x, y, z, N, S, E, W}
