@@ -36,20 +36,14 @@ def printlst(lst):
 def read_imu_data(port='COM6', baud_rate=115200, num_samples=50):
     with serial.Serial(port, baud_rate) as arduino:
         time.sleep(2)
-        start_time = time.perf_counter()
         
         arduino.reset_input_buffer()
         
         inline = arduino.readline().decode('utf-8', errors="ignore").rstrip()
         
         ax, ay, az, gx, gy, gz, mx, my, mz = parse(inline)
-        
-        cur_time = time.perf_counter()  # Get precise current time
-        elapsed_time = (cur_time - start_time)  # Convert to milliseconds
-        start_time = cur_time;
-        
-        
-        out = [elapsed_time, ax, ay, az, gx, gy, gz, mx, my, mz];
+           
+        out = [ax, ay, az, gx, gy, gz, mx, my, mz]
         
         #For debugging
         #printlst(out)
@@ -60,7 +54,7 @@ def read_imu_data(port='COM6', baud_rate=115200, num_samples=50):
 
     
 def main():
-    read_imu_data();
+    read_imu_data()
 
 if __name__ == "__main__":
     main()
