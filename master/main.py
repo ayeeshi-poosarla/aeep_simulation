@@ -12,12 +12,12 @@ def main():
     time_threshold = 3.0
     force_threshold = 10.0 # bennett pls fix
   
-    x_min = 1
-    x_max = 1
-    y_min = 1
-    y_max = 1
-    z_min = 1
-    z_max = 1
+    x_min = -75.485
+    x_max = 75.485
+    y_min = -82.4505
+    y_max = 82.4505
+    z_min = -63.0095
+    z_max = 63.0095
   
     while (
       x_min <= x <= x_max and
