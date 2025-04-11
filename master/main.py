@@ -51,6 +51,9 @@ def main():
     # Show axes indicator
     plotter.show_axes()
     
+    # Show the plotter window
+    plotter.show()
+    
     # force_text = plotter.add_text("Force: 0.0 N", position="upper_left", font_size=12)
 
     # Define the threshold force that triggers the red glow (5N)
@@ -93,11 +96,11 @@ def main():
         N, S, E, W = read_flex_data()
 
         madgwick = MadgwickFilter(sample_period=dt, beta=0.1)
-        position = madgwick([dt, ax, ay, az, gx, gy, gz, mx, my, mz], beta=0.1, L=0.1)
+        position = madgwick.compute_position([dt, ax, ay, az, gx, gy, gz, mx, my, mz], beta=0.1, L=0.1)
         
         # pressure = force_analysis(bend_values)
       
-        update_position() # update point on minimap
+        update_position(position) # update point on minimap
 
         # force thresholding
 
@@ -112,9 +115,6 @@ def main():
         # Set up the timer
     plotter.iren.add_observer('TimerEvent', update_position)
     plotter.iren.create_timer(dt)  # 300 milliseconds for better visualization
-
-    # Show the plotter window
-    plotter.show()
 
     N, S, E, W = read_flex_data()
     data = {dt, position, N, S, E, W}

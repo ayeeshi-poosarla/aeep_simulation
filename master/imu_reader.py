@@ -48,7 +48,7 @@ def printlst(lst):
         print(e)
 
 """Function opens connection to arduino nano port and collects data from the IMU"""
-def read_imu_data(port='/dev/ttyACM1', baud_rate=115200):
+def read_imu_data(port='COM6', baud_rate=115200):
     #Open up arduino nano connection
     with serial.Serial(port, baud_rate) as arduino:
         time.sleep(2)
