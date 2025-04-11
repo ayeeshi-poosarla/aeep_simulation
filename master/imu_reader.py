@@ -61,16 +61,7 @@ def read_imu_data(port='COM6', baud_rate=115200):
         
         ax, ay, az, gx, gy, gz, mx, my, mz = parse(inline)
 
-        out = [ax, ay, az, gx, gy, gz, mx, my, mz]
-        
-        #For debugging
-        #printlst(out)
-        
-        #return list of 9 values
-        return out
-        
-        
-
+        return ax, ay, az, gx, gy, gz, mx, my, mz
     
 def main():
     read_imu_data()

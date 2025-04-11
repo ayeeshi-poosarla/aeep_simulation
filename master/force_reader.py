@@ -28,7 +28,7 @@ def read_flex_data(port='COM3', baud_rate=9600):
         #print(f"West: {west}")
         #print(f"East: {east}")
 
-        return [north, south, west, east]
+        return north, south, west, east
 
 def main():
     read_flex_data()
