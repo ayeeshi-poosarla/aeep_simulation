@@ -1,14 +1,17 @@
 # force_analysis.py
 
 import numpy as np
+import math
 
-def force_analysis(bend_values, area, calibration_factor=1.0):
-    bend_values = np.array(bend_values)
-    
-    
-    # get pressure: P = F / A
-    pressures = bend_values / area
-    
-    return pressures
+def force_analysis(n, s, e, w):
+    x = e - w
+    y = n - s
+
+    angle = math.degrees(math.atan2(x, y))
+
+    if angle < 0:
+        angle += 360
+
+    return angle
 
 
