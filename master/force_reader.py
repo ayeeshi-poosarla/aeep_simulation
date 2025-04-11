@@ -7,7 +7,7 @@ def parse(data: str):
     matches = re.findall(pattern, data)
     return {direction: float(angle) for direction, angle in matches}
 
-def read_flex_data(port='COM3', baud_rate=9600):
+def read_flex_data(port='/dev/ttyACM0', baud_rate=9600):
     with serial.Serial(port, baud_rate) as arduino:
         time.sleep(2)
         inline = arduino.readline().decode('utf-8', errors="ignore").rstrip()
