@@ -29,7 +29,7 @@ void setup(void) {
 
   // Initialize the IMU (using I2C here)
   if (!icm.begin_I2C()) {
-    Serial.println("Failed to find ICM20948 chip");
+    // Serial.println("Failed to find ICM20948 chip");
     while (1) delay(10);  // Halt program if IMU not found
   }
 
@@ -54,15 +54,15 @@ void setup(void) {
   ZMag_offset = mag.magnetic.z;
 
   // Optional: print out offsets for debugging
-  Serial.println("Sensor offsets initialized:");
-  Serial.print("Accel: "); Serial.print(XAccel_offset); Serial.print(", ");
-  Serial.print(YAccel_offset); Serial.print(", "); Serial.println(ZAccel_offset);
+  // Serial.println("Sensor offsets initialized:");
+  // Serial.print("Accel: "); Serial.print(XAccel_offset); Serial.print(", ");
+  // Serial.print(YAccel_offset); Serial.print(", "); Serial.println(ZAccel_offset);
 
-  Serial.print("Gyro: "); Serial.print(XGyro_offset); Serial.print(", ");
-  Serial.print(YGyro_offset); Serial.print(", "); Serial.println(ZGyro_offset);
+  // Serial.print("Gyro: "); Serial.print(XGyro_offset); Serial.print(", ");
+  // Serial.print(YGyro_offset); Serial.print(", "); Serial.println(ZGyro_offset);
 
-  Serial.print("Mag: "); Serial.print(XMag_offset); Serial.print(", ");
-  Serial.print(YMag_offset); Serial.print(", "); Serial.println(ZMag_offset);
+  // Serial.print("Mag: "); Serial.print(XMag_offset); Serial.print(", ");
+  // Serial.print(YMag_offset); Serial.print(", "); Serial.println(ZMag_offset);
 }
 
 void loop() {
