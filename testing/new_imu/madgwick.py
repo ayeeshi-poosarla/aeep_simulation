@@ -139,7 +139,9 @@ class MadgwickFilter:
 def calibrate_magnetometer(mag_data):
     calibrated_mag_data = np.zeros_like(mag_data)
     B = [109.06238802, 37.90448955, 125.2127988]
-    A_inv = [[2.58891148, 0.03830976, -0.05865281],[0.03830976, 2.79695092, 0.03519644], [-0.05865281, 0.03519644, 2.72060039]]
+    A_inv = [[2.58891148, 0.03830976, -0.05865281],
+             [0.03830976, 2.79695092, 0.03519644], 
+             [-0.05865281, 0.03519644, 2.72060039]]
 
     for i in range(mag_data.shape[0]):
         # Subtract hard iron bias
