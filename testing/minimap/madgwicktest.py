@@ -74,12 +74,11 @@ class MadgwickFilter:
         f1 = _2q2 * q4 - _2q1 * q3 - accel[0]
         f2 = _2q1 * q2 + _2q3 * q4 - accel[1]
         f3 = 1.0 - _2q2 * q2 - _2q3 * q3 - accel[2]
-        # Similarly, include terms that incorporate the magnetic field;
-        # for brevity, we combine them into s1, s2, s3, s4 below.
-        s1 = -_2q3 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q2 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1])
-        s2 = _2q4 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q1 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1]) - 4.0 * q2 * (1.0 - 2.0 * q2q2 - 2.0 * q3q3 - accel[2])
-        s3 = -_2q1 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q4 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1]) - 4.0 * q3 * (1.0 - 2.0 * q2q2 - 2.0 * q3q3 - accel[2])
-        s4 = _2q2 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q3 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1])
+        # For brevity, the combined gradient terms are approximated as:
+        s1 = -_2q3 * f1 + _2q2 * f2
+        s2 = _2q4 * f1 + _2q1 * f2 - 4.0 * q2 * f3
+        s3 = -_2q1 * f1 + _2q4 * f2 - 4.0 * q3 * f3
+        s4 = _2q2 * f1 + _2q3 * f2
         norm_s = np.linalg.norm([s1, s2, s3, s4])
         if norm_s == 0:
             norm_s = 1
@@ -135,12 +134,87 @@ class MadgwickFilter:
         return np.array([[r11, r12, r13],
                          [r21, r22, r23],
                          [r31, r32, r33]])
+    
+    def compute_position(self, data):
+        """
+        Processes a sequence of IMU sensor data to compute the IMU's position over time.
+        
+        The input `data` should be an array-like object of shape (N, 10), where each row is:
+            [dt, ax, ay, az, gx, gy, gz, mx, my, mz]
+        with:
+            dt   : Sample period (in seconds) for the current measurement.
+            ax, ay, az : Accelerometer readings.
+            gx, gy, gz : Gyroscope readings (in rad/s).
+            mx, my, mz : Magnetometer readings.
+        
+        The function updates the Madgwick filter to compute orientation, rotates the accelerometer
+        measurements into the global frame, and then integrates to compute velocity and position.
+        
+        Returns:
+        --------
+        position : ndarray
+            An array of shape (N, 3) containing the [x, y, z] positions computed at each time step.
+        """
+        data = np.array(data)
+        N = data.shape[0]
+        
+        # Allocate arrays to store results
+        quaternions = np.zeros((N, 4))
+        euler_angles = np.zeros((N, 3))  # yaw, pitch, roll
+        global_acc = np.zeros((N, 3))
+        velocity = np.zeros((N, 3))
+        position = np.zeros((N, 3))
+        
+        # Loop over each sensor measurement
+        for i in range(N):
+            # Extract sensor measurements from the current row
+            dt = data[i, 0]
+            accel = data[i, 1:4]    # ax, ay, az
+            gyro  = data[i, 4:7]    # gx, gy, gz
+            mag   = data[i, 7:10]   # mx, my, mz
+            
+            # Update the sample period for the filter at this time step
+            self.sample_period = dt
+            
+            # Update the filter with the current sensor data
+            q = self.update(gyro=gyro, accel=accel, mag=mag)
+            quaternions[i] = q
+            euler_angles[i] = self.get_euler()
+            
+            # Compute rotation matrix from the current orientation
+            R = self.get_rotation_matrix()
+            # Rotate the accelerometer reading into the global frame
+            global_acc[i] = R @ accel
+            
+            # Integrate the global acceleration to compute velocity and position
+            if i > 0:
+                velocity[i] = velocity[i-1] + global_acc[i] * dt
+                position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i] * (dt ** 2)
+        
+        return position
 
 def calibrate_magnetometer(mag_data):
+    """
+    Calibrates raw magnetometer data using hard and soft iron correction.
+    
+    Parameters:
+    -----------
+    mag_data : ndarray
+        Raw magnetometer measurements of shape (N, 3).
+        
+    Returns:
+    --------
+    calibrated_mag_data : ndarray
+        The calibrated magnetometer data.
+    """
     calibrated_mag_data = np.zeros_like(mag_data)
-    B = [109.06238802, 37.90448955, 125.2127988]
-    A_inv = [[2.58891148, 0.03830976, -0.05865281],[0.03830976, 2.79695092, 0.03519644], [-0.05865281, 0.03519644, 2.72060039]]
-
+    # Hard iron bias
+    B = np.array([109.06238802, 37.90448955, 125.2127988])
+    # Inverse of soft iron matrix
+    A_inv = np.array([[2.58891148, 0.03830976, -0.05865281],
+                      [0.03830976, 2.79695092, 0.03519644],
+                      [-0.05865281, 0.03519644, 2.72060039]])
+    
     for i in range(mag_data.shape[0]):
         # Subtract hard iron bias
         mag_data[i] = mag_data[i] - B
@@ -148,80 +222,52 @@ def calibrate_magnetometer(mag_data):
         calibrated_mag_data[i] = np.dot(mag_data[i], A_inv)
     return calibrated_mag_data
 
+
+# Example usage:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
+    # For demonstration, assume we load sensor data from a CSV file.
+    # The CSV should have columns: dt, ax, ay, az, gx, gy, gz, mx, my, mz
+    # Here, we simulate loading such a CSV file.
     df = pd.read_csv('testing/new_imu/Trial1_Y_extracted.csv')
+    
+    # For this example, we select a subset of the data starting at a given index.
     mask = df['Mag_X'] < -1500
     start_index = df[mask].index[0]
-    data = df.loc[start_index:]
-
-    times = data['Timestamp'].to_numpy()
-    N = len(times)
-    gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
-    # gyro_data = np.column_stack((np.zeros(N), np.zeros(N), np.zeros(N)))
-    # accel_data = np.column_stack((np.zeros(N), data['Accel_Y'] - df['Accel_Y'].iloc[0], np.zeros(N)))
-    accel_data = np.column_stack((data['Accel_X'] - df['Accel_X'].iloc[0], data['Accel_Y'] - df['Accel_Y'].iloc[0], data['Accel_Z'] - df['Accel_Z'].iloc[0]))
-    mag_data = data[['Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
-    mag_data = calibrate_magnetometer(mag_data)
-
-    quaternions = np.zeros((N, 4))
-    euler_angles = np.zeros((N, 3))  # yaw, pitch, roll
-    global_acc = np.zeros((N, 3))
-    velocity = np.zeros((N, 3))
-    position = np.zeros((N, 3))
-
-    avg_dt = np.mean(times)
-    madgwick = MadgwickFilter(sample_period=avg_dt, beta=0.1)
-
-    # Arrays to store orientation (Euler angles) at each time step
+    data_df = df.loc[start_index:]
     
-
-    for i in range(N):
-        # Update the sample period for current time step
-        current_dt = times[i] if times[i] > 0 else avg_dt
-        madgwick.sample_period = current_dt
-
-        # Update the filter with current sensor data
-        q = madgwick.update(gyro=gyro_data[i], accel=accel_data[i], mag=mag_data[i])
-        quaternions[i] = q
-        euler_angles[i] = madgwick.get_euler()
-        
-        # Get rotation matrix and rotate accelerometer vector to global frame
-        R = madgwick.get_rotation_matrix()
-        global_acc[i] = R @ accel_data[i]
-        
-        # Integrate to compute velocity and position (using Euler integration)
-        if i > 0:
-            dt = times[i]
-            velocity[i] = velocity[i-1] + global_acc[i] * dt
-            position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i] * dt**2
-
-    # --- Step 5: Compute Displacement ---
+    # Convert the relevant columns into a NumPy array in the correct order.
+    # Here we assume that "Timestamp" holds dt values (sample periods),
+    # and the rest of the columns correspond to ax, ay, az, gx, gy, gz, mx, my, mz.
+    sensor_data = data_df[['Timestamp', 'Accel_X', 'Accel_Y', 'Accel_Z',
+                             'Gyro_X', 'Gyro_Y', 'Gyro_Z',
+                             'Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
+    
+    # Optionally, calibrate the magnetometer data
+    mag_data = sensor_data[:, 7:10]
+    sensor_data[:, 7:10] = calibrate_magnetometer(mag_data)
+    
+    # Create an instance of MadgwickFilter; initial sample period is set from the first row.
+    initial_dt = sensor_data[0, 0]
+    madgwick = MadgwickFilter(sample_period=initial_dt, beta=0.1)
+    
+    # Compute the position of the IMU for the entire data sequence
+    position = madgwick.compute_position(sensor_data)
+    print(position)
+    
     overall_displacement = np.linalg.norm(position[-1] - position[0])
-    cumulative_disp = np.zeros(N)
-    for i in range(1, N):
-        step_disp = np.linalg.norm(position[i] - position[i-1])
-        cumulative_disp[i] = cumulative_disp[i-1] + step_disp
+    print("Overall displacement (net):", overall_displacement)
     
-    # --- Step 6: Store Results in a DataFrame ---
-    data['yaw_deg'] = euler_angles[:, 0]
-    data['pitch_deg'] = euler_angles[:, 1]
-    data['roll_deg'] = euler_angles[:, 2]
-
-    data['vel_x'] = velocity[:, 0]
-    data['vel_y'] = velocity[:, 1]
-    data['vel_z'] = velocity[:, 2]
-
-    data['pos_x'] = position[:, 0]
-    data['pos_y'] = position[:, 1]
-    data['pos_z'] = position[:, 2]
-
-    data['cumulative_displacement'] = cumulative_disp
-
-    # print(data.tail())
-
-    print("Overall displacement (net):", data['cumulative_displacement'].iloc[-1])
-
-    # Save to a new CSV if desired
-    data.to_csv('Trial1_Y_fusion.csv', index=False)
+    # Optionally, save the computed positions to CSV.
+    pos_df = pd.DataFrame(position, columns=['pos_x', 'pos_y', 'pos_z'])
+    pos_df.to_csv('Trial1_Y_fusion_positions.csv', index=False)
+    
+    # Plot the position trajectory if desired.
+    plt.figure()
+    plt.plot(position[:, 0], position[:, 1], label='Trajectory (x-y)')
+    plt.xlabel('Position X')
+    plt.ylabel('Position Y')
+    plt.title('IMU Trajectory')
+    plt.legend()
+    plt.show()

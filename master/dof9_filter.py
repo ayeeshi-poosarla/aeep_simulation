@@ -17,6 +17,7 @@ class MadgwickFilter:
         self.beta = beta
         # Initialize quaternion: [q0, q1, q2, q3]
         self.q = np.array([1.0, 0.0, 0.0, 0.0])
+        self.position = 0
     
     def update(self, gyro, accel, mag):
         """
@@ -172,8 +173,10 @@ class MadgwickFilter:
         position = np.zeros((N, 3))
         rod_tip_position = np.zeros((N, 3)) 
         quaternions = np.zeros((N,4))
+        euler_angles = np.zeros((N,3))
+        global_acc = np.zeros((N,3))
 
-
+        
         madgwick = MadgwickFilter(sample_period=np.mean(dts), beta=beta)
 
         for i in range(N):
@@ -186,19 +189,19 @@ class MadgwickFilter:
             R = madgwick.get_rotation_matrix()
             global_acc = R @ accel_data[i]
 
-            if i == 0:
+            if i > 0:
                 velocity[i] = global_acc * dt
                 position[i] = 0.5 * global_acc * dt**2
             else:
                 velocity[i] = velocity[i-1] + global_acc * dt
-                position[i] = velocity[i-1] * dt + 0.5 * global_acc * dt**2
+                position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc * dt**2
 
             rod_offset = np.array([0,0,L])
             rod_global = R @ rod_offset
 
             rod_tip_position[i] = position[i] + rod_global
 
-        return rod_tip_position[-1]
+        return position[-1]
 
 madgwick = MadgwickFilter(sample_period=0.01)
 
