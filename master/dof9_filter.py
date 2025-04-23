@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import csv
 
 class MadgwickFilter:
     def __init__(self, sample_period, beta=0.1):
@@ -189,7 +190,7 @@ class MadgwickFilter:
             R = madgwick.get_rotation_matrix()
             global_acc = R @ accel_data[i]
 
-            if i > 0:
+            if i == 0:
                 velocity[i] = global_acc * dt
                 position[i] = 0.5 * global_acc * dt**2
             else:
@@ -203,8 +204,84 @@ class MadgwickFilter:
 
         return position[-1]
 
-madgwick = MadgwickFilter(sample_period=0.01)
+def read_imu_data(csv_path):
+        """
+        Generator that yields (gyro, accel, mag) tuples from a CSV with
+        columns: Timestamp,Accel_X,Accel_Y,Accel_Z,Gyro_X,Gyro_Y,Gyro_Z,Mag_X,Mag_Y,Mag_Z
+        """
+        with open(csv_path, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # parse into numpy arrays
+                accel = np.array([
+                    float(row['Accel_X']),
+                    float(row['Accel_Y']),
+                    float(row['Accel_Z'])
+                ])
+                gyro = np.array([
+                    float(row['Gyro_X']),
+                    float(row['Gyro_Y']),
+                    float(row['Gyro_Z'])
+                ])
+                mag = np.array([
+                    float(row['Mag_X']),
+                    float(row['Mag_Y']),
+                    float(row['Mag_Z'])
+                ])
+                yield gyro, accel, mag
 
-data = [0.107119,0.18,0.53,0.22,0.01,-0.01,0.01,-3334.05,-2921.4,1509.25]
-result = madgwick.compute_position(data, beta=0.1, L=0.1)
-print(result)
+if __name__ == "__main__":
+    import pandas as pd
+    import numpy as np
+    import time
+
+    csv_path = 'testing/new_imu/Trial2_Y_extracted.csv'
+
+    # 1) Load the CSV into a DataFrame
+    df = pd.read_csv(csv_path)
+    # pull out each sensor stream as an (N,3) array
+    ts    = df['Timestamp'].to_numpy()
+    accel = df[['Accel_X','Accel_Y','Accel_Z']].to_numpy()
+    gyro  = df[['Gyro_X','Gyro_Y','Gyro_Z']].to_numpy()
+    mag   = df[['Mag_X','Mag_Y','Mag_Z']].to_numpy()
+
+    N = len(df)
+    # prepare storage
+    velocity = np.zeros((N,3))
+    position = np.zeros((N,3))
+
+    # initialize filter
+    # use first Δt as the starting sample_period
+    dt0 = (ts[1] - ts[0]) if N>1 else 0.01
+    madgwick = MadgwickFilter(sample_period=dt0, beta=0.1)
+
+    for i in range(N):
+        # compute this step's dt
+        dt = (ts[i] - ts[i-1]) if i>0 else dt0
+        madgwick.sample_period = dt
+
+        # 2) update orientation
+        q = madgwick.update(
+            gyro= gyro[i],
+            accel=accel[i],
+            mag=  mag[i]
+        )
+
+        # 3) rotate accel into nav frame & subtract gravity
+        R     = madgwick.get_rotation_matrix()
+        a_nav = R.dot(accel[i]) - np.array([0,0,9.81])
+
+        # 4) integrate velocity & position
+        if i>0:
+            velocity[i] = velocity[i-1] + a_nav * dt
+            position[i] = (position[i-1]
+                           + velocity[i-1]*dt
+                           + 0.5*a_nav*dt**2)
+        else:
+            velocity[i] = a_nav * dt
+            position[i] = 0.5 * a_nav * dt**2
+
+        # 5) print position for this iteration
+        print(f"Sample {i:03d} @ t={ts[i]:.3f}s → position: {position[i].round(4)} m")
+
+
