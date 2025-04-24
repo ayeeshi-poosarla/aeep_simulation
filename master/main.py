@@ -10,7 +10,8 @@ import random
 import time
 
 def main():
-    stl_file = "bph_mold_combined.stl"
+    
+    stl_file = r"C:\Users\kayla\.spyder-py3\DT3_Local\bph_mold_combined.stl"
     mesh = pv.read(stl_file)
     min_x, max_x, min_y, max_y, min_z, max_z = mesh.bounds
     translation_vector = np.array([min_x, min_y, min_z])
@@ -51,8 +52,7 @@ def main():
     # Show axes indicator
     plotter.show_axes()
     
-    # Show the plotter window
-    plotter.show()
+    
     
     # force_text = plotter.add_text("Force: 0.0 N", position="upper_left", font_size=12)
 
@@ -63,7 +63,7 @@ def main():
     def update_position(current_position):
         marker.points = np.array([current_position])        
         mesh_actor.Modified()
-        plotter.render()
+        plotter.update()
 
     df = []
     time_above_pressure_thresh = 0
@@ -82,25 +82,36 @@ def main():
     z = 0 
 
     start_time = time.time()
+    plotter.iren.add_observer('TimerEvent', update_position)
+    plotter.iren.create_timer(300)
+    plotter.show(auto_close=False, interactive_update=True)
 
     while (
       x_min <= x <= x_max and
       y_min <= y <= y_max and
       z_min <= z <= z_max
     ):
+        print("meowmeowmeowmeow")
         current_time = time.time()
         dt = current_time - start_time
         start_time = current_time
 
         ax, ay, az, gx, gy, gz, mx, my, mz = read_imu_data()
-        N, S, E, W = read_flex_data()
+        #N, S, E, W = read_flex_data()
 
         madgwick = MadgwickFilter(sample_period=dt, beta=0.1)
         position = madgwick.compute_position([dt, ax, ay, az, gx, gy, gz, mx, my, mz], beta=0.1, L=0.1)
         
         # pressure = force_analysis(bend_values)
+
+        
       
         update_position(position) # update point on minimap
+        
+        
+        # 300 milliseconds for better visualization
+        # Show the plotter window
+        
 
         # force thresholding
 
@@ -113,8 +124,7 @@ def main():
         #     update_mesh_color(pressure, mesh_actor, plotter, force_threshold1, force_threshold2)
 
         # Set up the timer
-    plotter.iren.add_observer('TimerEvent', update_position)
-    plotter.iren.create_timer(dt)  # 300 milliseconds for better visualization
+    
 
     N, S, E, W = read_flex_data()
     data = {dt, position, N, S, E, W}

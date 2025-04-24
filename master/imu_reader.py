@@ -19,15 +19,18 @@ def parse(line):
     """
     
     # Regular expressions to extract data from the line
-    pattern_accel = re.compile(r'Accel X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+) m/s\^2')
-    pattern_gyro = re.compile(r'Gyro X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+) radians/s')
-    pattern_mag = re.compile(r'Mag X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+) uT')
+    pattern_accel = re.compile(r'Accel X:\s*(-?\d+(?:\.\d+)?)\s*Y:\s*(-?\d+(?:\.\d+)?)\s*Z:\s*(-?\d+(?:\.\d+)?)\s*m/s\^2')
+    pattern_gyro = re.compile(r'Gyro X:\s*(-?\d+(?:\.\d+)?)\s*Y:\s*(-?\d+(?:\.\d+)?)\s*Z:\s*(-?\d+(?:\.\d+)?)\s*radians/s')
+    pattern_mag = re.compile(r'Mag X:\s*(-?\d+(?:\.\d+)?)\s*Y:\s*(-?\d+(?:\.\d+)?)\s*Z:\s*(-?\d+(?:\.\d+)?)\s*uT')
+
 
     # Initialize all values to None
     ax = ay = az = gx = gy = gz = mx = my = mz = None
 
+    #print(f"Parsing line: {line}")
     # Extract acceleration data
     match_accel = pattern_accel.search(line)
+    #print(f"Accel match: {match_accel}")
     if match_accel:
         ax = float(match_accel.group(1))
         ay = float(match_accel.group(2))
@@ -49,7 +52,18 @@ def parse(line):
 
     # Check if any values are still None (i.e., failed parsing)
     if None in [ax, ay, az, gx, gy, gz, mx, my, mz]:
-        raise ValueError("Could not parse all IMU data from line.")
+        #If values are none initialize all to 0
+        print("Failed to parse all values, initializing to 0")
+        ax = 0
+        ay = 0
+        az = 0
+        gx = 0
+        gy = 0
+        gz = 0
+        mx = 0
+        my = 0
+        mz = 0
+    
 
     return ax, ay, az, gx, gy, gz, mx, my, mz
 
