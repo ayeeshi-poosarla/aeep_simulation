@@ -110,10 +110,8 @@ class RodTracker:
         a_nav = R @ accel 
 
         # 3) simple integration (will drift!)
-        # before updating velocity:
-        self.position += self.velocity * self.dt + 0.5 * abs(a_nav) * self.dt**2
-        self.velocity += abs(a_nav) * self.dt
-
+        self.velocity += a_nav * self.dt
+        self.position += self.velocity * self.dt + 0.5 * a_nav * self.dt**2
 
         # 4) compute end-of-rod pose
         #    position of rod tip in nav frame:
@@ -156,7 +154,7 @@ if __name__ == "__main__":
     dt = 0.10        #
     L  = 0         # rod length = 15 cm
     tracker = RodTracker(dt, L)
-    csv_path = 'testing/new_imu/Trial3_Y_extracted.csv'
+    csv_path = '30cm_trial1_extracted.csv'
     imu_stream = read_imu_data(csv_path)
     for gyro, accel, mag in read_imu_data(csv_path):
         rod_tip, q = tracker.update(gyro, accel, mag)

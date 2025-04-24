@@ -190,7 +190,7 @@ class MadgwickFilter:
             R = madgwick.get_rotation_matrix()
             global_acc = R @ accel_data[i]
 
-            if i == 0:
+            if i > 0:
                 velocity[i] = global_acc * dt
                 position[i] = 0.5 * global_acc * dt**2
             else:
@@ -231,57 +231,35 @@ def read_imu_data(csv_path):
                 yield gyro, accel, mag
 
 if __name__ == "__main__":
+    csv_path = '50cm_trial2_extracted.csv'
+
+    # 1) Load CSV into a (N×10) array [Timestamp, Accel_X–Z, Gyro_X–Z, Mag_X–Z]
     import pandas as pd
-    import numpy as np
-    import time
-
-    csv_path = 'testing/new_imu/Trial2_Y_extracted.csv'
-
-    # 1) Load the CSV into a DataFrame
     df = pd.read_csv(csv_path)
-    # pull out each sensor stream as an (N,3) array
-    ts    = df['Timestamp'].to_numpy()
-    accel = df[['Accel_X','Accel_Y','Accel_Z']].to_numpy()
-    gyro  = df[['Gyro_X','Gyro_Y','Gyro_Z']].to_numpy()
-    mag   = df[['Mag_X','Mag_Y','Mag_Z']].to_numpy()
 
-    N = len(df)
-    # prepare storage
-    velocity = np.zeros((N,3))
-    position = np.zeros((N,3))
+    # ensure columns are in the right order
+    cols = ['Timestamp',
+            'Accel_X','Accel_Y','Accel_Z',
+            'Gyro_X','Gyro_Y','Gyro_Z',
+            'Mag_X','Mag_Y','Mag_Z']
+    data_2d = df[cols].to_numpy()            # shape=(N,10)
 
-    # initialize filter
-    # use first Δt as the starting sample_period
-    dt0 = (ts[1] - ts[0]) if N>1 else 0.01
-    madgwick = MadgwickFilter(sample_period=dt0, beta=0.1)
+    # 2) Flatten to 1-D for compute_position
+    data_flat = data_2d.flatten()            # length = N*10
 
-    for i in range(N):
-        # compute this step's dt
-        dt = (ts[i] - ts[i-1]) if i>0 else dt0
-        madgwick.sample_period = dt
+    # 3) Instantiate filter & compute position
+    madgwick = MadgwickFilter(
+        sample_period = df['Timestamp'].diff().mean(),  # average Δt
+        beta          = 0.1
+    )
 
-        # 2) update orientation
-        q = madgwick.update(
-            gyro= gyro[i],
-            accel=accel[i],
-            mag=  mag[i]
-        )
+    # L is the rod length in meters
+    L = 0
 
-        # 3) rotate accel into nav frame & subtract gravity
-        R     = madgwick.get_rotation_matrix()
-        a_nav = R.dot(accel[i]) - np.array([0,0,9.81])
+    final_pos = madgwick.compute_position(
+        data = data_flat,
+        beta = madgwick.beta,
+        L    = L
+    )
 
-        # 4) integrate velocity & position
-        if i>0:
-            velocity[i] = velocity[i-1] + a_nav * dt
-            position[i] = (position[i-1]
-                           + velocity[i-1]*dt
-                           + 0.5*a_nav*dt**2)
-        else:
-            velocity[i] = a_nav * dt
-            position[i] = 0.5 * a_nav * dt**2
-
-        # 5) print position for this iteration
-        print(f"Sample {i:03d} @ t={ts[i]:.3f}s → position: {position[i].round(4)} m")
-
-
+    print("Final IMU-derived position:", final_pos)

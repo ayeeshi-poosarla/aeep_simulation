@@ -161,7 +161,7 @@ def run():
     positional()
     position_vectors = []
 
-    with open("minimap/coordinates.txt", "r") as file:
+    with open("testing/data/4_23_25/10cm_trial1.txt", "r") as file:
         for line in file:
             # Skip empty lines
             if line.strip():

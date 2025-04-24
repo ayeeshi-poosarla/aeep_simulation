@@ -1,229 +1,49 @@
 import numpy as np
 import pandas as pd
+from ahrs.filters import Madgwick
 
-class MadgwickFilter:
-    def __init__(self, sample_period, beta=0.1):
-        """
-        Initializes the Madgwick filter.
-        
-        Parameters:
-        -----------
-        sample_period : float
-            The sample period (in seconds) between measurements.
-        beta : float
-            The filter gain; higher beta gives more weight to the correction.
-        """
-        self.sample_period = sample_period
-        self.beta = beta
-        # Initialize quaternion: [q0, q1, q2, q3]
-        self.q = np.array([1.0, 0.0, 0.0, 0.0])
-    
-    def update(self, gyro, accel, mag):
-        """
-        Update the filter with new sensor measurements.
-        
-        Parameters:
-        -----------
-        gyro : array-like, shape (3,)
-            Gyroscope measurements (rad/s) as [gx, gy, gz].
-        accel : array-like, shape (3,)
-            Accelerometer measurements (in g or m/s^2, if gravity is present).
-        mag : array-like, shape (3,)
-            Magnetometer measurements.
-            
-        Returns:
-        --------
-        q : ndarray, shape (4,)
-            The updated orientation quaternion.
-        """
-        q1, q2, q3, q4 = self.q
+def quaternion_to_rotation_matrix(q):
+    w, x, y, z = q
+    return np.array([
+        [1 - 2*(y*y + z*z),   2*(x*y - w*z),   2*(x*z + w*y)],
+        [  2*(x*y + w*z),   1 - 2*(x*x + z*z), 2*(y*z - w*x)],
+        [  2*(x*z - w*y),     2*(y*z + w*x), 1 - 2*(x*x + y*y)]
+    ])
 
-        # Normalize accelerometer measurement
-        if np.linalg.norm(accel) == 0:
-            return self.q  # avoid division by zero
-        accel = accel / np.linalg.norm(accel)
+# Load your data
+df = pd.read_csv('30cm_trial2_extracted.csv')
+n  = len(df)
 
-        # Normalize magnetometer measurement
-        if np.linalg.norm(mag) == 0:
-            return self.q
-        mag = mag / np.linalg.norm(mag)
+Q = np.zeros((n, 4))
+V = np.zeros((n, 3))
+P = np.zeros((n, 3))
 
-        # Auxiliary variables to avoid repeated arithmetic
-        _2q1 = 2.0 * q1
-        _2q2 = 2.0 * q2
-        _2q3 = 2.0 * q3
-        _2q4 = 2.0 * q4
-        _4q1 = 4.0 * q1
-        _4q2 = 4.0 * q2
-        _4q3 = 4.0 * q3
-        _8q2 = 8.0 * q2
-        _8q3 = 8.0 * q3
-        q1q1 = q1 * q1
-        q2q2 = q2 * q2
-        q3q3 = q3 * q3
-        q4q4 = q4 * q4
-        q2q4 = q2 * q4
+# Initialize Madgwick filter
+madgwick       = Madgwick()        # you can also pass beta=… or an initial sampleperiod here
+Q[0]           = [1.0, 0.0, 0.0, 0.0]
 
-        # Reference direction of Earth's magnetic field
-        hx = mag[0] * (q1q1 + q2q2 - q3q3 - q4q4) + 2.0 * mag[1] * (q2 * q3 - q1 * q4) + 2.0 * mag[2] * (q2 * q4 + q1 * q3)
-        hy = 2.0 * mag[0] * (q2 * q3 + q1 * q4) + mag[1] * (q1q1 - q2q2 + q3q3 - q4q4) + 2.0 * mag[2] * (q3 * q4 - q1 * q2)
-        _2bx = np.sqrt(hx * hx + hy * hy)
-        _2bz = 2.0 * mag[0] * (q2 * q4 - q1 * q3) + 2.0 * mag[1] * (q3 * q4 + q1 * q2) + mag[2] * (q1q1 - q2q2 - q3q3 + q4q4)
+for i in range(1, n):
+    # Compute Δt
+    dt = df.at[i, 'Timestamp'] - df.at[i-1, 'Timestamp']
 
-        # Gradient descent algorithm corrective step
-        f1 = _2q2 * q4 - _2q1 * q3 - accel[0]
-        f2 = _2q1 * q2 + _2q3 * q4 - accel[1]
-        f3 = 1.0 - _2q2 * q2 - _2q3 * q3 - accel[2]
-        # Similarly, include terms that incorporate the magnetic field;
-        # for brevity, we combine them into s1, s2, s3, s4 below.
-        s1 = -_2q3 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q2 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1])
-        s2 = _2q4 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q1 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1]) - 4.0 * q2 * (1.0 - 2.0 * q2q2 - 2.0 * q3q3 - accel[2])
-        s3 = -_2q1 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q4 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1]) - 4.0 * q3 * (1.0 - 2.0 * q2q2 - 2.0 * q3q3 - accel[2])
-        s4 = _2q2 * (2.0 * q2q4 - _2q1 * q3 - accel[0]) + _2q3 * (2.0 * q1 * q2 + _2q3 * q4 - accel[1])
-        norm_s = np.linalg.norm([s1, s2, s3, s4])
-        if norm_s == 0:
-            norm_s = 1
-        s1, s2, s3, s4 = s1 / norm_s, s2 / norm_s, s3 / norm_s, s4 / norm_s
+    # Tell the filter what your sample period is
+    madgwick.sampleperiod = dt
 
-        # Compute the rate of change of quaternion from gyroscope
-        gx, gy, gz = gyro
-        q_dot1 = 0.5 * (-q2 * gx - q3 * gy - q4 * gz) - self.beta * s1
-        q_dot2 = 0.5 * (q1 * gx + q3 * gz - q4 * gy) - self.beta * s2
-        q_dot3 = 0.5 * (q1 * gy - q2 * gz + q4 * gx) - self.beta * s3
-        q_dot4 = 0.5 * (q1 * gz + q2 * gy - q3 * gx) - self.beta * s4
+    # Grab your sensors
+    acc = df.loc[i, ['Accel_X','Accel_Y','Accel_Z']].values
+    gyr = df.loc[i, ['Gyro_X','Gyro_Y','Gyro_Z']].values
+    #mag = df.loc[i, ['Mag_X','Mag_Y','Mag_Z']].values
+    mag = np.zeros(3)
 
-        # Integrate to yield new quaternion
-        q1 += q_dot1 * self.sample_period
-        q2 += q_dot2 * self.sample_period
-        q3 += q_dot3 * self.sample_period
-        q4 += q_dot4 * self.sample_period
-        q_new = np.array([q1, q2, q3, q4])
-        # Normalize quaternion
-        self.q = q_new / np.linalg.norm(q_new)
-        return self.q
+    # Update orientation (no dt argument here!)
+    Q[i] = madgwick.updateMARG(Q[i-1], gyr=gyr, acc=acc, mag=mag)
 
-    def get_euler(self):
-        """
-        Returns the current orientation as Euler angles (yaw, pitch, roll) in degrees.
-        """
-        q = self.q
-        # Yaw (z-axis rotation)
-        yaw = np.arctan2(2*(q[0]*q[1] + q[2]*q[3]),
-                         1 - 2*(q[1]*q[1] + q[2]*q[2]))
-        # Pitch (y-axis rotation)
-        pitch = np.arcsin(2*(q[0]*q[2] - q[3]*q[1]))
-        # Roll (x-axis rotation)
-        roll = np.arctan2(2*(q[0]*q[3] + q[1]*q[2]),
-                          1 - 2*(q[2]*q[2] + q[3]*q[3]))
-        return np.degrees(yaw), np.degrees(pitch), np.degrees(roll)
-    
-    def get_rotation_matrix(self):
-        """
-        Returns the 3x3 rotation matrix corresponding to the current quaternion.
-        """
-        q = self.q
-        # Compute the rotation matrix elements
-        r11 = 1 - 2*(q[2]**2 + q[3]**2)
-        r12 = 2*(q[1]*q[2] - q[0]*q[3])
-        r13 = 2*(q[1]*q[3] + q[0]*q[2])
-        r21 = 2*(q[1]*q[2] + q[0]*q[3])
-        r22 = 1 - 2*(q[1]**2 + q[3]**2)
-        r23 = 2*(q[2]*q[3] - q[0]*q[1])
-        r31 = 2*(q[1]*q[3] - q[0]*q[2])
-        r32 = 2*(q[2]*q[3] + q[0]*q[1])
-        r33 = 1 - 2*(q[1]**2 + q[2]**2)
-        return np.array([[r11, r12, r13],
-                         [r21, r22, r23],
-                         [r31, r32, r33]])
+    # Rotate accel into world frame
+    Rwb       = quaternion_to_rotation_matrix(Q[i])
+    acc_world = Rwb.dot(acc)
 
-def calibrate_magnetometer(mag_data):
-    calibrated_mag_data = np.zeros_like(mag_data)
-    B = [109.06238802, 37.90448955, 125.2127988]
-    A_inv = [[2.58891148, 0.03830976, -0.05865281],
-             [0.03830976, 2.79695092, 0.03519644], 
-             [-0.05865281, 0.03519644, 2.72060039]]
+    # Integrate velocity & position
+    V[i] = V[i-1] + acc_world * dt
+    P[i] = P[i-1] + V[i] * dt
 
-    for i in range(mag_data.shape[0]):
-        # Subtract hard iron bias
-        mag_data[i] = mag_data[i] - B
-        # Apply soft iron transformation
-        calibrated_mag_data[i] = np.dot(mag_data[i], A_inv)
-    return calibrated_mag_data
-
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-
-    df = pd.read_csv('testing/new_imu/Trial1_Y_extracted.csv')
-    mask = df['Mag_X'] < -1500
-    start_index = df[mask].index[0]
-    data = df.loc[start_index:]
-
-    times = data['Timestamp'].to_numpy()
-    N = len(times)
-    gyro_data = data[['Gyro_X', 'Gyro_Y', 'Gyro_Z']].to_numpy()
-    # gyro_data = np.column_stack((np.zeros(N), np.zeros(N), np.zeros(N)))
-    # accel_data = np.column_stack((np.zeros(N), data['Accel_Y'] - df['Accel_Y'].iloc[0], np.zeros(N)))
-    accel_data = np.column_stack((data['Accel_X'] - df['Accel_X'].iloc[0], data['Accel_Y'] - df['Accel_Y'].iloc[0], data['Accel_Z'] - df['Accel_Z'].iloc[0]))
-    mag_data = data[['Mag_X', 'Mag_Y', 'Mag_Z']].to_numpy()
-    mag_data = calibrate_magnetometer(mag_data)
-
-    quaternions = np.zeros((N, 4))
-    euler_angles = np.zeros((N, 3))  # yaw, pitch, roll
-    global_acc = np.zeros((N, 3))
-    velocity = np.zeros((N, 3))
-    position = np.zeros((N, 3))
-
-    avg_dt = np.mean(times)
-    madgwick = MadgwickFilter(sample_period=avg_dt, beta=0.1)
-
-    # Arrays to store orientation (Euler angles) at each time step
-    
-
-    for i in range(N):
-        # Update the sample period for current time step
-        current_dt = times[i] if times[i] > 0 else avg_dt
-        madgwick.sample_period = current_dt
-
-        # Update the filter with current sensor data
-        q = madgwick.update(gyro=gyro_data[i], accel=accel_data[i], mag=mag_data[i])
-        quaternions[i] = q
-        euler_angles[i] = madgwick.get_euler()
-        
-        # Get rotation matrix and rotate accelerometer vector to global frame
-        R = madgwick.get_rotation_matrix()
-        global_acc[i] = R @ accel_data[i]
-        
-        # Integrate to compute velocity and position (using Euler integration)
-        if i > 0:
-            dt = times[i]
-            velocity[i] = velocity[i-1] + global_acc[i] * dt
-            position[i] = position[i-1] + velocity[i-1] * dt + 0.5 * global_acc[i] * dt**2
-
-    # --- Step 5: Compute Displacement ---
-    overall_displacement = np.linalg.norm(position[-1] - position[0])
-    cumulative_disp = np.zeros(N)
-    for i in range(1, N):
-        step_disp = np.linalg.norm(position[i] - position[i-1])
-        cumulative_disp[i] = cumulative_disp[i-1] + step_disp
-    
-    # --- Step 6: Store Results in a DataFrame ---
-    data['yaw_deg'] = euler_angles[:, 0]
-    data['pitch_deg'] = euler_angles[:, 1]
-    data['roll_deg'] = euler_angles[:, 2]
-
-    data['vel_x'] = velocity[:, 0]
-    data['vel_y'] = velocity[:, 1]
-    data['vel_z'] = velocity[:, 2]
-
-    data['pos_x'] = position[:, 0]
-    data['pos_y'] = position[:, 1]
-    data['pos_z'] = position[:, 2]
-
-    data['cumulative_displacement'] = cumulative_disp
-
-    # print(data.tail())
-
-    print("Overall displacement (net):", data['cumulative_displacement'].iloc[-1])
-
-    # Save to a new CSV if desired
-    data.to_csv('Trial1_Y_fusion.csv', index=False)
+print("Final displacement (m):", P[-1])

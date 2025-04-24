@@ -2,7 +2,7 @@ import re
 import pandas as pd
 
 # Replace with your input file path
-file_path = 'Trial 2 Y_Direction_ReDo.txt'
+file_path = 'testing/data/4_23_25/50cm_trial2.txt'
 
 # Lists to store extracted data
 time_stamps, accel_x, accel_y, accel_z = [], [], [], []
@@ -74,6 +74,6 @@ data = pd.DataFrame({
 })
 
 # Save to CSV
-data.to_csv('Trial2_Y_extracted.csv', index=False)
+data.to_csv('50cm_trial2_extracted.csv', index=False)
 
 print(data.head())
