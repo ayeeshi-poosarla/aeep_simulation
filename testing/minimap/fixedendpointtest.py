@@ -51,7 +51,7 @@ class OrientationBiasEKF:
         Q = np.eye(7)*1e-5
         Q[4:,4:] *= 1e-4
         self.ekf.Q = Q
-        self.R_accmag = np.eye(6)*1
+        self.R_accmag = np.eye(6)*1e-4
         self.R_yaw    = np.array([[1e-3]])   # tighter yaw correction
 
     def predict(self, gyro, dt):
@@ -70,6 +70,8 @@ class OrientationBiasEKF:
 
     def update(self, accel, mag):
         # 1) full accel+mag update
+        if accel == 0:
+            accel = 1e-6
         a_norm = accel/np.linalg.norm(accel)
         m_norm = mag/np.linalg.norm(mag)
         z_am = np.hstack((a_norm, m_norm))
