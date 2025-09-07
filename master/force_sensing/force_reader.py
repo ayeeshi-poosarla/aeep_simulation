@@ -54,12 +54,12 @@ def read_flex_data(port='COM3', baud_rate=9600):
             return 0.0, 0.0, 0.0, 0.0
 
         # Retrieve angles for each direction, defaulting to 0.0 if not found
-        north = dire.get("North", 0.0)
-        south = dire.get("South", 0.0)
-        west = dire.get("West", 0.0)
-        east = dire.get("East", 0.0)
+        #north = dire.get("North", 0.0)
+        #south = dire.get("South", 0.0)
+        #west = dire.get("West", 0.0)
+        #east = dire.get("East", 0.0)
 
-        return north, south, west, east
+        return dire
 
 
 def main():
