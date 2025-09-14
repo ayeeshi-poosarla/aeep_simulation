@@ -6,13 +6,15 @@ from threading import Thread
 
 pattern = re.compile(r"(\w+):\s*(-?\d+(?:\.\d+)?)")
 
+latest_angles = (0.0, 0.0, 0.0, 0.0)
+
 def parse(data: str):
     matches = pattern.findall(data)
     return {d: float(v) for d, v in matches}
 
 def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
     """ Continuously read serial and update latest_angles """
-    global latest_angles
+    global latest_angles, stop_flag
     try:
         with serial.Serial(port, baud_rate, timeout=1) as arduino:
             time.sleep(2) 
