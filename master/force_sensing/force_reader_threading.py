@@ -4,31 +4,13 @@ import re
 from quadrant_detection import determine_quadrant
 from threading import Thread
 
-latest_angles = (0.0, 0.0, 0.0, 0.0)
+pattern = re.compile(r"(\w+):\s*(-?\d+(?:\.\d+)?)")
 
 def parse(data: str):
-    """
-    Parses the input string from the Arduino to extract directional angle values.
+    matches = pattern.findall(data)
+    return {d: float(v) for d, v in matches}
 
-    The expected format in the string is something like:
-    "Sensor 1 ( North ) | Angle: 12.34°"
-    
-    Parameters:
-        data (str): A line of data received from the Arduino containing sensor directions and angles.
-
-    Returns:
-        dict: A dictionary mapping directions (e.g., "North", "South") to their corresponding float angle values.
-    """
-    # Regular expression to capture direction and angle
-    pattern = r"Sensor \d+ \(\s*(\w+)\s*\)\s*\|\s*Angle:\s*([\d.]+)°"
-    
-    # Find all matches of the pattern
-    matches = re.findall(pattern, data)
-    
-    # Convert matches to dictionary with direction as key and angle as float
-    return {direction: float(angle) for direction, angle in matches}
-
-def serial_loop(port='/dev/tty.usbmodem21101', baud_rate=115200):
+def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
     """ Continuously read serial and update latest_angles """
     global latest_angles
     try:
@@ -48,7 +30,7 @@ def serial_loop(port='/dev/tty.usbmodem21101', baud_rate=115200):
     except Exception as e:
         print(f"[Serial error] {e}")
 
-def start_serial_thread(port='/dev/tty.usbmodem21101', baud_rate=115200):
+def start_serial_thread(port='/dev/ttyACM0', baud_rate=115200):
     thread = Thread(target=serial_loop, args=(port, baud_rate), daemon=True)
     thread.start()
     return thread
