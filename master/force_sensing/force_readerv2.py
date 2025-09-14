@@ -27,7 +27,7 @@ def read_flex_data(ser):
 
 def main():
     try:
-        with serial.Serial("COM3", 9600, timeout=1) as ser:
+        with serial.Serial("/dev/ttyACM0", 115200, timeout=1) as ser:
             time.sleep(2)  # let Arduino reboot
             while True:
                 angles = read_flex_data(ser)
