@@ -4,7 +4,7 @@ from filterpy.kalman import ExtendedKalmanFilter
 
 # ——— quaternion utilities ———
 def normalize_quat(q):
-    return q / np.linalg.norm(q)
+    return q / np.linalg.nxorm(q)
 
 def quaternion_to_rotation_matrix(q):
     w, x, y, z = q

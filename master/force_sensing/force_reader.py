@@ -1,6 +1,7 @@
 import serial
 import time
 import re
+from quadrant_detection import determine_quadrant
 
 def parse(data: str):
     """
@@ -39,6 +40,7 @@ def read_flex_data(port='COM3', baud_rate=9600):
                If parsing fails, all values default to 0.0.
     """
     # Open the serial port
+    data = {"north": 0.0, "south": 0.0, "east": 0.0, "west": 0.0}
     with serial.Serial(port, baud_rate) as arduino:
         # Allow time for connection to establish
         time.sleep(2)
@@ -54,12 +56,12 @@ def read_flex_data(port='COM3', baud_rate=9600):
             return 0.0, 0.0, 0.0, 0.0
 
         # Retrieve angles for each direction, defaulting to 0.0 if not found
-        #north = dire.get("North", 0.0)
-        #south = dire.get("South", 0.0)
-        #west = dire.get("West", 0.0)
-        #east = dire.get("East", 0.0)
+        north = dire.get("North", 0.0)
+        south = dire.get("South", 0.0)
+        west = dire.get("West", 0.0)
+        east = dire.get("East", 0.0)
 
-        return dire
+        return north, south, west, east
 
 
 def main():
@@ -68,10 +70,14 @@ def main():
     Modify this function to loop, log, or display data as needed.
     """
     try:
-        n, s, w, e = read_flex_data()
-        print(f"North: {n}°\nSouth: {s}°\nWest: {w}°\nEast: {e}°")
+        while True:
+            n, s, w, e = read_flex_data()
+            print(determine_quadrant(n, s, w, e, threshold = 0.5))
+            time.sleep(0.1)
     except Exception as err:
         print(f"Error reading flex data: {err}")
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt")
 
 
 if __name__ == "__main__":
