@@ -17,7 +17,7 @@ def parse(data: str):
         dict: A dictionary mapping directions (e.g., "North", "South") to their corresponding float angle values.
     """
     # Regular expression to capture direction and angle
-    pattern = r"Sensor \d+ \(\s*(\w+)\s*\)\s*\|\s*Angle:\s*([\d.]+)°"
+    pattern = r"(\w+):\s*(-?\d+(?:\.\d+)?)"
     
     # Find all matches of the pattern
     matches = re.findall(pattern, data)
@@ -26,7 +26,7 @@ def parse(data: str):
     return {direction: float(angle) for direction, angle in matches}
 
 
-def read_flex_data(port='COM3', baud_rate=9600):
+def read_flex_data(port='/dev/ttyACM0', baud_rate=115200):
     """
     Connects to the Arduino over serial, reads one line of data from flex sensors,
     and extracts angle information for each direction.
