@@ -16,7 +16,7 @@ def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
     """ Continuously read serial and update latest_angles """
     global latest_angles, stop_flag
     try:
-        with serial.Serial(port, baud_rate, timeout=1) as arduino:
+        with serial.Serial(port, baud_rate, timeout=0.1) as arduino:
             time.sleep(2) 
             while True:
                 inline = arduino.readline().decode('utf-8', errors="ignore").strip()
