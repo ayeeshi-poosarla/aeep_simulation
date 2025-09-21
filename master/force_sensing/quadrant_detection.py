@@ -1,4 +1,4 @@
-def determine_quadrant(n, s, e, w, threshold = 0.1):
+def determine_quadrant(n, s, e, w, threshold = 10):
     vertical = n - s
     horizontal = e - w
 
