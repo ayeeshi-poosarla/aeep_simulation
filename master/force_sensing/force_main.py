@@ -11,7 +11,7 @@ def scan_angles():
             n, s, e, w = get_latest_angles()
             quadrant = determine_quadrant(n, s, e, w)
             print(quadrant)
-            f.write(f"{time.time()},{quadrant}\n")  # save timestamp + result
+            f.write(f"{time.time()},{quadrant}\n")  # save timestamp + flex sensor data
             f.flush()  # ensure data is written immediately
             time.sleep(0.2)
         
