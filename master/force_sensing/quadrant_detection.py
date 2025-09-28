@@ -8,20 +8,20 @@ def determine_quadrant(n, s, e, w, threshold = 15):
         horizontal = 0
 
     if vertical > 0 and horizontal > 0:
-        return "quadrant 1"
+        return "Quadrant 1"
     elif vertical > 0 and horizontal < 0:
-        return "quadrant 2"
+        return "Quadrant 2"
     elif vertical < 0 and horizontal < 0:
-        return "quadrant 3"
+        return "Quadrant 3"
     elif vertical < 0 and horizontal > 0:
-        return "quadrant 4"
+        return "Quadrant 4"
     elif vertical > 0:
-        return "north"
+        return "North"
     elif vertical < 0:
-        return "south"
+        return "South"
     elif horizontal > 0:
-        return "east"
+        return "East"
     elif horizontal < 0:
-        return "west"
+        return "West"
     else:
-        return "center"
+        return "Center"
