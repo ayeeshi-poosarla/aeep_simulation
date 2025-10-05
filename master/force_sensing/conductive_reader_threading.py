@@ -4,32 +4,15 @@ import re
 from threading import Thread
 
 # Regex pattern to parse "Raw: 512  V: 2.502  %: 45.3"
-pattern = re.compile(r"Raw:\s*(\d+)\s+V:\s*([\d.]+)\s+%:\s*([\d.]+)")
+pattern = re.compile(r"Rel(\d+):\s*([\d.]+)")
 
-# Global latest sensor values
-# Structure: (raw, voltage, percent)
-latest_sheet = (0, 0.0, 0.0)
+latest_sheet = [0.0] * 10
 
-stop_flag = False  # for stopping the thread
+stop_flag = False 
 
 def parse(data: str):
-    """
-    Parses a line from the Arduino conductive sheet sensor.
-    
-    Example input:
-        "Raw: 512  V: 2.502  %: 45.3"
-    
-    Returns:
-        dict: {"raw": int, "voltage": float, "percent": float}
-    """
-    match = pattern.search(data)
-    if match:
-        return {
-            "raw": int(match.group(1)),
-            "voltage": float(match.group(2)),
-            "percent": float(match.group(3)),
-        }
-    return {}
+    matches = re.findall(r"Rel(\d+):\s*([\d.]+)", data)
+    return {int(index): float(value) for index, value in matches}
 
 
 def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
@@ -37,18 +20,14 @@ def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
     global latest_sheet, stop_flag
     try:
         with serial.Serial(port, baud_rate, timeout=0.01) as arduino:
-            time.sleep(2)  # allow connection to settle
+            time.sleep(2)
             while not stop_flag:
                 inline = arduino.readline().decode('utf-8', errors="ignore").strip()
                 if not inline:
                     continue
                 parsed = parse(inline)
                 if parsed:
-                    latest_sheet = (
-                        parsed["raw"],
-                        parsed["voltage"],
-                        parsed["percent"],
-                    )
+                    latest_sheet = [parsed.get(i, 0.0) for i in range(10)]
     except Exception as e:
         print(f"[Sheet Serial error] {e}")
 
@@ -71,15 +50,3 @@ def stop_serial_thread():
     """ Signal the serial loop to stop """
     global stop_flag
     stop_flag = True
-
-
-# Optional quick test
-if __name__ == "__main__":
-    start_serial_thread()
-    try:
-        while True:
-            print(get_latest_sheet())
-            time.sleep(0.2)
-    except KeyboardInterrupt:
-        stop_serial_thread()
-        print("Stopped.")

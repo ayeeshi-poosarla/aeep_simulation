@@ -1,8 +1,10 @@
-from force_reader_threading import get_latest_angles, start_serial_thread, stop_serial_thread
+from force_reader_threading import get_latest_angles, start_serial_thread
 from quadrant_detection import determine_quadrant
+from conductive_reader_threading import *
 import time
 import os
 import shutil
+import csv
 
 start_serial_thread()
 
@@ -15,24 +17,31 @@ def store_data(file_path, name):
     
 
 def scan_angles():
-<<<<<<< HEAD
-    while True:
-        n,s,e,w, = get_latest_angles()
-        with open("output.txt", "w") as f:
-            f.write()
-        print(determine_quadrant(n,s,e,w))
-        time.sleep(0.2)
-=======
-    with open("quadrant_log.txt", "a") as f:
+    new_file_1 = not os.path.exists("quadrant_log.csv")
+    new_file_2 = not os.path.exists("force_log.csv")
+
+    with open("quadrant_log.csv", "a", newline='') as f1, open("force_log.csv", "a", newline='') as f2:
+        quadrant_writer = csv.writer(f1)
+        force_writer = csv.writer(f2)
+
+        if new_file_1:
+            quadrant_writer.writerow(["timestamp", "quadrant"])
+        if new_file_2:
+            force_writer.writerow(["timestamp", "N", "S", "E", "W"])
+
         while True:
-                        
             n, s, e, w = get_latest_angles()
+            latest_sheet = get_latest_sheet()
             quadrant = determine_quadrant(n, s, e, w)
+            timestamp = time.time()
+
             print(quadrant)
-            f.write(f"{time.time()},{quadrant}\n")  # save timestamp + flex sensor data
-            f.flush()  # ensure data is written immediately
+            quadrant_writer.writerow([timestamp, quadrant])
+            force_writer.writerow([timestamp, *latest_sheet])
+            f1.flush()
+            f2.flush()
+
             time.sleep(0.2)
->>>>>>> f610de155418669eaea8481d8ae2082f7481f48f
         
 
 if __name__ == "__main__":
