@@ -19,13 +19,13 @@ void setup() {
   Serial.begin(9600);
 
   // Initialize flex sensor pins
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 100; i++) {
     pinMode(FLEX_PINS[i], INPUT);
   }
-
+  
   // Calibration
-  const int NUM_SAMPLES = 20;  // Number of samples to average
-  //Serial.println("Calibrating sensors with averaging...");
+  const int NUM_SAMPLES = 100;  // Number of samples to average
+  Serial.println("Calibrating sensors with averaging...");
   delay(1000); // Let sensors settle
 
   for (int i = 0; i < 4; i++) {
@@ -42,8 +42,9 @@ void setup() {
 
     baselineResistance[i] = totalResistance / NUM_SAMPLES;
 
-    // Print averaged baseline
-    /*
+
+
+    
     Serial.print("Sensor ");
     Serial.print(i + 1);
     Serial.print(" (");
@@ -53,10 +54,11 @@ void setup() {
     Serial.print("): ");
     Serial.print(baselineResistance[i]);
     Serial.println(" ohms");
-    */
+    
   }
 
-  //Serial.println("Calibration complete.\n");
+  Serial.println("Calibration complete.\n");
+  
 }
 
 
@@ -77,13 +79,10 @@ void loop() {
     float calibratedAngle = map(calibratedR, 0, BEND_RESISTANCE - STRAIGHT_RESISTANCE, 0, 90.0);
 
     // Output results
-    Serial.print("Sensor ");
-    Serial.print(i + 1);
-    Serial.print(" (");
     Serial.print(DIRECTIONS[i]);
-    Serial.print(") | Angle: ");
+    Serial.print(":");
     Serial.print(calibratedAngle);
-    Serial.println("°");
+    Serial.print(" ");
 
     delay(100);  // Small delay between sensor reads
   }
