@@ -6,7 +6,7 @@ from threading import Thread
 # Regex pattern to parse "Raw: 512  V: 2.502  %: 45.3"
 pattern = re.compile(r"Rel(\d+):\s*([\d.]+)")
 
-latest_sheet = [0.0] * 10
+latest_sheet = [0.0] * 15
 
 stop_flag = False 
 
@@ -15,7 +15,7 @@ def parse(data: str):
     return {int(index): float(value) for index, value in matches}
 
 
-def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
+def serial_loop(port='/dev/arduino_conductive', baud_rate=115200):
     """ Continuously read serial and update latest_sheet """
     global latest_sheet, stop_flag
     try:
@@ -27,12 +27,12 @@ def serial_loop(port='/dev/ttyACM0', baud_rate=115200):
                     continue
                 parsed = parse(inline)
                 if parsed:
-                    latest_sheet = [parsed.get(i, 0.0) for i in range(10)]
+                    latest_sheet = [parsed.get(i, 0.0) for i in range(15)]
     except Exception as e:
         print(f"[Sheet Serial error] {e}")
 
 
-def start_serial_thread(port='/dev/ttyACM0', baud_rate=115200):
+def start_serial_thread(port='/dev/arduino_conductive', baud_rate=115200):
     """ Start the serial reading thread """
     global stop_flag
     stop_flag = False
@@ -50,3 +50,12 @@ def stop_serial_thread():
     """ Signal the serial loop to stop """
     global stop_flag
     stop_flag = True
+    
+def scan_angles():
+    while True:
+        print(latest_sheet)
+        time.sleep(0.2)
+
+if __name__ == "__main__":
+    start_serial_thread()
+    scan_angles()
