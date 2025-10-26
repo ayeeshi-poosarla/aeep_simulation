@@ -4,21 +4,29 @@ import matplotlib.pyplot as plt
 cols = ['timestamp'] + [f'force_{i+1}' for i in range(14)]
 df = pd.read_csv('master/force_sensing/EA5/force_log.csv', names=cols, skiprows=1)
 
+# Convert timestamp to float
 df['timestamp'] = df['timestamp'].astype(float)
 
+# Detect calibration end by finding the first significant jump in data
+# Calculate the sum of all force readings per row
 df['total_force'] = df[[f'force_{i+1}' for i in range(14)]].sum(axis=1)
 
-calibration_threshold = 50.0
+# Find where calibration ends (first significant increase)
+# Look for first row where total force exceeds a threshold (e.g., 1.0)
+calibration_threshold = 1.0
 calibration_end_idx = df[df['total_force'] > calibration_threshold].index
 if len(calibration_end_idx) > 0:
     start_idx = calibration_end_idx[0]
 else:
-    start_idx = 0  
+    start_idx = 0  # If no jump detected, use all data
 
+# Filter data to only include post-calibration
 df = df.iloc[start_idx:].copy()
 
+# Convert timestamp to delta t (time elapsed from calibration end in seconds)
 df['delta_t'] = df['timestamp'] - df['timestamp'].iloc[0]
 
+# Prepare subplots (grid with 3 columns)
 num_sensors = 14
 fig, axs = plt.subplots(nrows=5, ncols=3, figsize=(18, 12), sharex=True)
 axs = axs.flatten()  # To simplify iteration
@@ -54,6 +62,16 @@ for i in range(num_sensors):
 for j in range(num_sensors, len(axs)):
     fig.delaxes(axs[j])
 
+# Set x-axis tick increments (change the number to your desired increment in seconds)
+tick_increment = 150  # Increased spacing to reduce overlap
+max_time = df['delta_t'].max()
+import numpy as np
+x_ticks = np.arange(0, max_time + tick_increment, tick_increment)
+for ax in axs[:num_sensors]:
+    ax.set_xticks(x_ticks)
+    ax.tick_params(axis='x', rotation=0, labelsize=4)  # Horizontal labels with smaller font
+
+# Add x-axis label to all bottom row subplots
 fig.text(0.5, 0.02, 'Time (s)', ha='center', fontsize=12)
 
 plt.tight_layout()
