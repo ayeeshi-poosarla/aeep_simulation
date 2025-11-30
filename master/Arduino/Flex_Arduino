@@ -1,3 +1,5 @@
+//This file is used to control the four flex sensors in NSEW directions
+
 // Flex sensor analog input pins
 const int FLEX_PINS[4] = {A0, A1, A2, A3};
 
