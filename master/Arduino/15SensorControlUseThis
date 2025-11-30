@@ -9,11 +9,13 @@ int baseline[numSensors];
 const float alpha = 0.15;   // smoothing
 
 void setup() {
+  //ensure baud rate matches
   Serial.begin(115200);
 
   Serial.println("Calibration: leave sensors untouched...");
   delay(2000);
 
+  //normalization by averaging base line
   for (int i = 0; i < numSensors; i++) {
     baseline[i] = readAverage(sensorPins[i], samplesAvg * 10);
     ema[i] = baseline[i];
@@ -26,6 +28,7 @@ void setup() {
 }
 
 void loop() {
+//read across sensors and print relative rates
   for (int i = 0; i < numSensors; i++) {
     int raw = readAverage(sensorPins[i], samplesAvg);
     ema[i] = alpha * raw + (1 - alpha) * ema[i];
@@ -44,6 +47,7 @@ void loop() {
 }
 
 // --- Averaging function ---
+//take average across several signals to smooth noise
 int readAverage(int pin, int n) {
   long sum = 0;
   for (int i = 0; i < n; i++) {
